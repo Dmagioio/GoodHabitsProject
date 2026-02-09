@@ -70,6 +70,7 @@ import com.example.goodhabits.ui.theme.GoodHabitsTheme
 import com.example.goodhabits.ui.theme.GreyBlue
 import com.example.goodhabits.ui.theme.Purple
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -86,9 +87,10 @@ enum class RootScreen {
 }
 
 data class Habit(
+    val id: Int,
     val title: String,
     val color: Color,
-    val isCompleted: Boolean = false
+    val completedDates: Set<Long> = emptySet()
 )
 
 class MainActivity : ComponentActivity() {
@@ -99,57 +101,74 @@ class MainActivity : ComponentActivity() {
         setContent {
             GoodHabitsTheme {
                 var currentRootScreen by remember { mutableStateOf(RootScreen.Main) }
+                var nextHabitId by remember { mutableIntStateOf(0) }
                 val habits = remember { mutableStateListOf<Habit>() }
+
+                // Функція перемикання виконання звички на певну дату
+                val toggleHabitForDate: (Habit, LocalDate) -> Unit = { habit, date ->
+                    val index = habits.indexOfFirst { it.id == habit.id }
+                    if (index != -1) {
+                        val current = habits[index]
+                        val key = date.toEpochDay()
+                        val updatedDates = current.completedDates.toMutableSet()
+                        if (updatedDates.contains(key)) {
+                            updatedDates.remove(key)
+                        } else {
+                            updatedDates.add(key)
+                        }
+                        habits[index] = current.copy(completedDates = updatedDates)
+                    }
+                }
 
                 when (currentRootScreen) {
                     RootScreen.Main -> {
-                        val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
-                        val scope = rememberCoroutineScope()
-                        var selectedTabIndex by remember { mutableIntStateOf(0) }
+                val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
+                val scope = rememberCoroutineScope()
+                var selectedTabIndex by remember { mutableIntStateOf(0) }
 
-                        ModalNavigationDrawer(
-                            drawerState = drawerState,
-                            drawerContent = {
-                                ModalDrawerSheet {
-                                    Text("Звички", modifier = Modifier.padding(16.dp))
-                                    NavigationDrawerItem(
-                                        label = { Text("Ідеї") },
-                                        selected = false,
-                                        onClick = {
-                                            scope.launch { drawerState.close() }
-                                        }
-                                    )
-                                    NavigationDrawerItem(
-                                        label = { Text("Аналітика") },
-                                        selected = false,
-                                        onClick = {
-                                            scope.launch { drawerState.close() }
-                                        }
-                                    )
-                                    NavigationDrawerItem(
-                                        label = { Text("Налаштування") },
-                                        selected = false,
-                                        onClick = {
-                                            scope.launch { drawerState.close() }
-                                        }
-                                    )
+                ModalNavigationDrawer(
+                    drawerState = drawerState,
+                    drawerContent = {
+                        ModalDrawerSheet {
+                            Text("Звички", modifier = Modifier.padding(16.dp))
+                            NavigationDrawerItem(
+                                label = { Text("Ідеї") },
+                                selected = false,
+                                onClick = {
+                                    scope.launch { drawerState.close() }
                                 }
-                            },
-                            gesturesEnabled = true
-                        ) {
-                            Scaffold(
-                                modifier = Modifier.fillMaxSize(),
-                                topBar = {
-                                    TopAppBar(
-                                        title = { Text("Звички") },
-                                        navigationIcon = {
-                                            IconButton(onClick = {
-                                                scope.launch {
-                                                    if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                                                }
-                                            }) {
-                                                Icon(Icons.Filled.Menu, contentDescription = "Menu")
-                                            }
+                            )
+                            NavigationDrawerItem(
+                                label = { Text("Аналітика") },
+                                selected = false,
+                                onClick = {
+                                    scope.launch { drawerState.close() }
+                                }
+                            )
+                            NavigationDrawerItem(
+                                label = { Text("Налаштування") },
+                                selected = false,
+                                onClick = {
+                                    scope.launch { drawerState.close() }
+                                }
+                            )
+                        }
+                    },
+                    gesturesEnabled = true
+                ) {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        topBar = {
+                            TopAppBar(
+                                title = { Text("Звички") },
+                                navigationIcon = {
+                                    IconButton(onClick = {
+                                        scope.launch {
+                                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                                        }
+                                    }) {
+                                        Icon(Icons.Filled.Menu, contentDescription = "Menu")
+                                    }
                                         },
                                         actions = {
                                             IconButton(onClick = {
@@ -160,10 +179,10 @@ class MainActivity : ComponentActivity() {
                                                     contentDescription = "Додати звичку"
                                                 )
                                             }
-                                        }
-                                    )
                                 }
-                            ) { innerPadding ->
+                            )
+                        }
+                    ) { innerPadding ->
                                 Column(
                                     modifier = Modifier
                                         .padding(innerPadding)
@@ -179,61 +198,66 @@ class MainActivity : ComponentActivity() {
                                             }
                                         )
                                     } else {
-                                        TabRow(
-                                            selectedTabIndex = selectedTabIndex,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(horizontal = 10.dp, vertical = 8.dp)
-                                                .clip(RoundedCornerShape(10.dp))
-                                                .background(color = GreyBlue)
-                                                .padding(4.dp),
-                                            containerColor = Color.Transparent,
-                                            indicator = { },
-                                            divider = { }
-                                        ) {
-                                            TabScreen.entries.forEachIndexed { index, screen ->
-                                                val selected = selectedTabIndex == index
-                                                Tab(
-                                                    selected = selected,
-                                                    onClick = { selectedTabIndex = index },
-                                                    selectedContentColor = Color.White,
-                                                    unselectedContentColor = Color.DarkGray,
-                                                    modifier = Modifier
-                                                        .clip(RoundedCornerShape(10.dp))
-                                                        .background(if (selected) Purple else Color.Transparent)
-                                                ) {
-                                                    Box(
-                                                        modifier = Modifier.padding(vertical = 10.dp),
+                            TabRow(
+                                selectedTabIndex = selectedTabIndex,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(color = GreyBlue)
+                                    .padding(4.dp),
+                                containerColor = Color.Transparent,
+                                indicator = { },
+                                divider = { }
+                            ) {
+                                TabScreen.entries.forEachIndexed { index, screen ->
+                                    val selected = selectedTabIndex == index
+                                    Tab(
+                                        selected = selected,
+                                        onClick = { selectedTabIndex = index },
+                                        selectedContentColor = Color.White,
+                                        unselectedContentColor = Color.DarkGray,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(if (selected) Purple else Color.Transparent)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier.padding(vertical = 10.dp),
                                                         contentAlignment = Alignment.Center
-                                                    ) {
-                                                        Text(
-                                                            text = screen.title,
-                                                            style = MaterialTheme.typography.labelLarge,
-                                                            modifier = Modifier.zIndex(1f)
-                                                        )
-                                                    }
-                                                }
-                                            }
+                                        ) {
+                                            Text(
+                                                text = screen.title,
+                                                style = MaterialTheme.typography.labelLarge,
+                                                modifier = Modifier.zIndex(1f)
+                                            )
                                         }
+                                    }
+                                }
+                            }
                                         Crossfade(
                                             targetState = selectedTabIndex,
                                             label = "TabContentCrossfade"
                                         ) { targetIndex ->
-                                            when (TabScreen.entries[targetIndex]) {
+                                when (TabScreen.entries[targetIndex]) {
                                                 TabScreen.Daily -> DailyScreen(
                                                     habits = habits,
-                                                    onToggleHabit = { habit ->
-                                                        val index = habits.indexOf(habit)
-                                                        if (index != -1) {
-                                                            val current = habits[index]
-                                                            habits[index] =
-                                                                current.copy(isCompleted = !current.isCompleted)
-                                                        }
+                                                    onToggleHabitToday = { habit ->
+                                                        toggleHabitForDate(habit, LocalDate.now())
                                                     }
                                                 )
 
-                                                TabScreen.Weekly -> WeeklyScreen(habits = habits)
-                                                TabScreen.Overall -> OverallScreen(habits = habits)
+                                                TabScreen.Weekly -> WeeklyScreen(
+                                                    habits = habits,
+                                                    onToggleHabitForDate = { habit, date ->
+                                                        toggleHabitForDate(habit, date)
+                                                    }
+                                                )
+                                                TabScreen.Overall -> OverallScreen(
+                                                    habits = habits,
+                                                    onToggleHabitToday = { habit ->
+                                                        toggleHabitForDate(habit, LocalDate.now())
+                                                    }
+                                                )
                                             }
                                         }
                                     }
@@ -245,8 +269,14 @@ class MainActivity : ComponentActivity() {
                     RootScreen.AddHabit -> {
                         AddHabitScreen(
                             onBack = { currentRootScreen = RootScreen.Main },
-                            onSaveHabit = { habit ->
-                                habits.add(habit)
+                            onSaveHabit = { title, color ->
+                                habits.add(
+                                    Habit(
+                                        id = nextHabitId++,
+                                        title = title,
+                                        color = color
+                                    )
+                                )
                                 currentRootScreen = RootScreen.Main
                             }
                         )
@@ -260,8 +290,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DailyScreen(
     habits: List<Habit>,
-    onToggleHabit: (Habit) -> Unit
+    onToggleHabitToday: (Habit) -> Unit
 ) {
+    val today = LocalDate.now().toEpochDay()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -287,7 +319,12 @@ fun DailyScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(habits) { habit ->
-                    HabitCard(habit = habit, onToggleHabit = { onToggleHabit(habit) })
+                    val isCompletedToday = habit.completedDates.contains(today)
+                    HabitCard(
+                        habit = habit,
+                        isCompletedToday = isCompletedToday,
+                        onToggleHabit = { onToggleHabitToday(habit) }
+                    )
                 }
             }
         }
@@ -295,7 +332,10 @@ fun DailyScreen(
 }
 
 @Composable
-fun WeeklyScreen(habits: List<Habit>) {
+fun WeeklyScreen(
+    habits: List<Habit>,
+    onToggleHabitForDate: (Habit, LocalDate) -> Unit
+) {
     if (habits.isEmpty()) {
         Box(
             modifier = Modifier
@@ -317,14 +357,22 @@ fun WeeklyScreen(habits: List<Habit>) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(habits) { habit ->
-                WeeklyHabitCard(habit = habit)
+                WeeklyHabitCard(
+                    habit = habit,
+                    onToggleForDate = { date ->
+                        onToggleHabitForDate(habit, date)
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun OverallScreen(habits: List<Habit>) {
+fun OverallScreen(
+    habits: List<Habit>,
+    onToggleHabitToday: (Habit) -> Unit
+) {
     if (habits.isEmpty()) {
         Box(
             modifier = Modifier
@@ -346,7 +394,10 @@ fun OverallScreen(habits: List<Habit>) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(habits) { habit ->
-                OverallHabitCard(habit = habit)
+                OverallHabitCard(
+                    habit = habit,
+                    onToggleToday = { onToggleHabitToday(habit) }
+                )
             }
         }
     }
@@ -439,6 +490,7 @@ fun DateHeader() {
 @Composable
 fun HabitCard(
     habit: Habit,
+    isCompletedToday: Boolean,
     onToggleHabit: () -> Unit
 ) {
     Card(
@@ -460,7 +512,7 @@ fun HabitCard(
                 style = MaterialTheme.typography.titleMedium
             )
             Checkbox(
-                checked = habit.isCompleted,
+                checked = isCompletedToday,
                 onCheckedChange = { onToggleHabit() },
                 colors = CheckboxDefaults.colors(
                     checkedColor = Color.White,
@@ -473,7 +525,13 @@ fun HabitCard(
 }
 
 @Composable
-fun WeeklyHabitCard(habit: Habit) {
+fun WeeklyHabitCard(
+    habit: Habit,
+    onToggleForDate: (LocalDate) -> Unit
+) {
+    val today = LocalDate.now()
+    val dates = (6 downTo 0).map { today.minusDays(it.toLong()) } // 7 днів, від старшого до сьогодні
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -492,42 +550,56 @@ fun WeeklyHabitCard(habit: Habit) {
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
 
-            // Дні тижня
+            // Дні тижня (підписи)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                listOf("Вт", "Ср", "Чт", "Пт", "Сб", "Нд", "Пн").forEach { day ->
+                val dayFormatter = SimpleDateFormat("E", Locale("uk"))
+                dates.forEach { date ->
+                    val cal = Calendar.getInstance().apply {
+                        set(Calendar.YEAR, date.year)
+                        set(Calendar.MONTH, date.monthValue - 1)
+                        set(Calendar.DAY_OF_MONTH, date.dayOfMonth)
+                    }
+                    val dayName = dayFormatter.format(cal.time)
                     Text(
-                        text = day,
+                        text = dayName,
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.DarkGray
                     )
                 }
             }
 
-            WeekDatesRow(color = habit.color)
+            WeekDatesRow(
+                dates = dates,
+                habit = habit,
+                onToggleForDate = onToggleForDate
+            )
         }
     }
 }
 
 @Composable
-fun WeekDatesRow(color: Color) {
-    val calendar = remember { Calendar.getInstance() }
-    val today = calendar.get(Calendar.DAY_OF_MONTH)
-    val dates = (today - 6..today).toList()
-
+fun WeekDatesRow(
+    dates: List<LocalDate>,
+    habit: Habit,
+    onToggleForDate: (LocalDate) -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        dates.forEachIndexed { index, date ->
-            val isSelected = index == dates.lastIndex
+        dates.forEach { date ->
+            val key = date.toEpochDay()
+            val isSelected = habit.completedDates.contains(key)
             DateCircle(
-                number = if (date > 0) date else 1,
+                number = date.dayOfMonth,
                 selected = isSelected,
-                color = color
-            )
+                color = habit.color
+            ) {
+                onToggleForDate(date)
+            }
         }
     }
 }
@@ -536,7 +608,8 @@ fun WeekDatesRow(color: Color) {
 fun DateCircle(
     number: Int,
     selected: Boolean,
-    color: Color
+    color: Color,
+    onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -547,7 +620,8 @@ fun DateCircle(
                 width = 2.dp,
                 color = if (selected) color else Color.LightGray,
                 shape = CircleShape
-            ),
+            )
+            .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -559,7 +633,12 @@ fun DateCircle(
 }
 
 @Composable
-fun OverallHabitCard(habit: Habit) {
+fun OverallHabitCard(
+    habit: Habit,
+    onToggleToday: () -> Unit
+) {
+    val todayKey = LocalDate.now().toEpochDay()
+    val isCompletedToday = habit.completedDates.contains(todayKey)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -583,8 +662,8 @@ fun OverallHabitCard(habit: Habit) {
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
                 Checkbox(
-                    checked = habit.isCompleted,
-                    onCheckedChange = { },
+                    checked = isCompletedToday,
+                    onCheckedChange = { onToggleToday() },
                     colors = CheckboxDefaults.colors(
                         checkedColor = habit.color,
                         checkmarkColor = Color.White,
@@ -593,7 +672,10 @@ fun OverallHabitCard(habit: Habit) {
                 )
             }
 
-            DotGrid(activeColor = habit.color)
+            DotGrid(
+                completedDates = habit.completedDates,
+                activeColor = habit.color
+            )
         }
     }
 }
@@ -602,10 +684,11 @@ fun OverallHabitCard(habit: Habit) {
 fun DotGrid(
     rows: Int = 6,
     columns: Int = 18,
-    activeDots: Int = 8,
+    completedDates: Set<Long>,
     activeColor: Color
 ) {
     val totalDots = rows * columns
+    val today = LocalDate.now()
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -615,7 +698,11 @@ fun DotGrid(
             ) {
                 repeat(columns) { column ->
                     val index = row * columns + column
-                    val isActive = index >= totalDots - activeDots
+                    // index = 0 -> найстаріший день, index = totalDots-1 -> сьогодні
+                    val daysAgo = (totalDots - 1) - index
+                    val date = today.minusDays(daysAgo.toLong())
+                    val key = date.toEpochDay()
+                    val isActive = completedDates.contains(key)
                     Dot(
                         color = if (isActive) activeColor else Color.LightGray
                     )
@@ -629,7 +716,7 @@ fun DotGrid(
 fun Dot(color: Color) {
     Box(
         modifier = Modifier
-            .size(6.dp)
+            .size(12.dp)
             .clip(CircleShape)
             .background(color)
     )
@@ -639,7 +726,7 @@ fun Dot(color: Color) {
 @Composable
 fun AddHabitScreen(
     onBack: () -> Unit,
-    onSaveHabit: (Habit) -> Unit
+    onSaveHabit: (String, Color) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -668,7 +755,7 @@ fun AddHabitScreen(
 @Composable
 fun AddHabitContent(
     modifier: Modifier = Modifier,
-    onSaveHabit: (Habit) -> Unit
+    onSaveHabit: (String, Color) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var motivation by remember { mutableStateOf("") }
@@ -752,7 +839,7 @@ fun AddHabitContent(
         Button(
             onClick = {
                 if (title.isNotBlank()) {
-                    onSaveHabit(Habit(title = title, color = selectedColor))
+                    onSaveHabit(title, selectedColor)
                 }
             },
             modifier = Modifier
@@ -812,10 +899,10 @@ fun GreetingPreview() {
     GoodHabitsTheme {
         DailyScreen(
             habits = listOf(
-                Habit(title = "Пити воду", color = Purple),
-                Habit(title = "Читати книгу", color = Color(0xFFFF6F91))
+                Habit(id = 0, title = "Пити воду", color = Purple),
+                Habit(id = 1, title = "Читати книгу", color = Color(0xFFFF6F91))
             ),
-            onToggleHabit = {}
+            onToggleHabitToday = {}
         )
     }
 }
