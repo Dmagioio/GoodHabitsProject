@@ -106,7 +106,6 @@ class MainActivity : ComponentActivity() {
                 val habits = remember { mutableStateListOf<Habit>() }
                 var habitToEdit by remember { mutableStateOf<Habit?>(null) }
 
-                // Функція перемикання виконання звички на певну дату
                 val toggleHabitForDate: (Habit, LocalDate) -> Unit = { habit, date ->
                     val index = habits.indexOfFirst { it.id == habit.id }
                     if (index != -1) {
@@ -124,9 +123,9 @@ class MainActivity : ComponentActivity() {
 
                 when (currentRootScreen) {
                     RootScreen.Main -> {
-                        val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
-                        val scope = rememberCoroutineScope()
-                        var selectedTabIndex by remember { mutableIntStateOf(0) }
+                val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
+                val scope = rememberCoroutineScope()
+                var selectedTabIndex by remember { mutableIntStateOf(0) }
 
                 ModalNavigationDrawer(
                     drawerState = drawerState,
@@ -180,7 +179,7 @@ class MainActivity : ComponentActivity() {
                                                     imageVector = Icons.Filled.Add,
                                                     contentDescription = "Додати звичку"
                                                 )
-                                            }
+                                    }
                                 }
                             )
                         }
@@ -240,7 +239,7 @@ class MainActivity : ComponentActivity() {
                                             targetState = selectedTabIndex,
                                             label = "TabContentCrossfade"
                                         ) { targetIndex ->
-                                            when (TabScreen.entries[targetIndex]) {
+                                when (TabScreen.entries[targetIndex]) {
                                                 TabScreen.Daily -> DailyScreen(
                                                     habits = habits,
                                                     onToggleHabitToday = { habit ->
@@ -592,7 +591,7 @@ fun WeeklyHabitCard(
     onClick: () -> Unit
 ) {
     val today = LocalDate.now()
-    val dates = (6 downTo 0).map { today.minusDays(it.toLong()) } // 7 днів, від старшого до сьогодні
+    val dates = (6 downTo 0).map { today.minusDays(it.toLong()) }
 
     Card(
         modifier = Modifier
@@ -612,27 +611,6 @@ fun WeeklyHabitCard(
                 text = habit.title,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
-
-            // Дні тижня (підписи)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val dayFormatter = SimpleDateFormat("E", Locale("uk"))
-                dates.forEach { date ->
-                    val cal = Calendar.getInstance().apply {
-                        set(Calendar.YEAR, date.year)
-                        set(Calendar.MONTH, date.monthValue - 1)
-                        set(Calendar.DAY_OF_MONTH, date.dayOfMonth)
-                    }
-                    val dayName = dayFormatter.format(cal.time)
-                    Text(
-                        text = dayName,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.DarkGray
-                    )
-                }
-            }
 
             WeekDatesRow(
                 dates = dates,
@@ -654,14 +632,31 @@ fun WeekDatesRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         dates.forEach { date ->
+            val cal = Calendar.getInstance().apply {
+                set(Calendar.YEAR, date.year)
+                set(Calendar.MONTH, date.monthValue - 1)
+                set(Calendar.DAY_OF_MONTH, date.dayOfMonth)
+            }
+            val dayFormatter = SimpleDateFormat("E", Locale("uk"))
+            val dayName = dayFormatter.format(cal.time)
             val key = date.toEpochDay()
             val isSelected = habit.completedDates.contains(key)
-            DateCircle(
-                number = date.dayOfMonth,
-                selected = isSelected,
-                color = habit.color
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                onToggleForDate(date)
+                Text(
+                    text = dayName,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.DarkGray
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                DateCircle(
+                    number = date.dayOfMonth,
+                    selected = isSelected,
+                    color = habit.color
+                ) {
+                    onToggleForDate(date)
+                }
             }
         }
     }
@@ -763,7 +758,6 @@ fun DotGrid(
             ) {
                 repeat(columns) { column ->
                     val index = row * columns + column
-                    // index = 0 -> найстаріший день, index = totalDots-1 -> сьогодні
                     val daysAgo = (totalDots - 1) - index
                     val date = today.minusDays(daysAgo.toLong())
                     val key = date.toEpochDay()
