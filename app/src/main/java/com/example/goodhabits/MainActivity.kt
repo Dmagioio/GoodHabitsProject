@@ -83,7 +83,8 @@ enum class TabScreen(val title: String) {
 
 enum class RootScreen {
     Main,
-    AddHabit
+    AddHabit,
+    EditHabit
 }
 
 data class Habit(
@@ -103,6 +104,7 @@ class MainActivity : ComponentActivity() {
                 var currentRootScreen by remember { mutableStateOf(RootScreen.Main) }
                 var nextHabitId by remember { mutableIntStateOf(0) }
                 val habits = remember { mutableStateListOf<Habit>() }
+                var habitToEdit by remember { mutableStateOf<Habit?>(null) }
 
                 // Функція перемикання виконання звички на певну дату
                 val toggleHabitForDate: (Habit, LocalDate) -> Unit = { habit, date ->
@@ -122,9 +124,9 @@ class MainActivity : ComponentActivity() {
 
                 when (currentRootScreen) {
                     RootScreen.Main -> {
-                val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
-                val scope = rememberCoroutineScope()
-                var selectedTabIndex by remember { mutableIntStateOf(0) }
+                        val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
+                        val scope = rememberCoroutineScope()
+                        var selectedTabIndex by remember { mutableIntStateOf(0) }
 
                 ModalNavigationDrawer(
                     drawerState = drawerState,
@@ -238,11 +240,18 @@ class MainActivity : ComponentActivity() {
                                             targetState = selectedTabIndex,
                                             label = "TabContentCrossfade"
                                         ) { targetIndex ->
-                                when (TabScreen.entries[targetIndex]) {
+                                            when (TabScreen.entries[targetIndex]) {
                                                 TabScreen.Daily -> DailyScreen(
                                                     habits = habits,
                                                     onToggleHabitToday = { habit ->
-                                                        toggleHabitForDate(habit, LocalDate.now())
+                                                        toggleHabitForDate(
+                                                            habit,
+                                                            LocalDate.now()
+                                                        )
+                                                    },
+                                                    onHabitClick = { habit ->
+                                                        habitToEdit = habit
+                                                        currentRootScreen = RootScreen.EditHabit
                                                     }
                                                 )
 
@@ -250,12 +259,24 @@ class MainActivity : ComponentActivity() {
                                                     habits = habits,
                                                     onToggleHabitForDate = { habit, date ->
                                                         toggleHabitForDate(habit, date)
+                                                    },
+                                                    onHabitClick = { habit ->
+                                                        habitToEdit = habit
+                                                        currentRootScreen = RootScreen.EditHabit
                                                     }
                                                 )
+
                                                 TabScreen.Overall -> OverallScreen(
                                                     habits = habits,
                                                     onToggleHabitToday = { habit ->
-                                                        toggleHabitForDate(habit, LocalDate.now())
+                                                        toggleHabitForDate(
+                                                            habit,
+                                                            LocalDate.now()
+                                                        )
+                                                    },
+                                                    onHabitClick = { habit ->
+                                                        habitToEdit = habit
+                                                        currentRootScreen = RootScreen.EditHabit
                                                     }
                                                 )
                                             }
@@ -281,6 +302,38 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     }
+
+                    RootScreen.EditHabit -> {
+                        val habit = habitToEdit
+                        if (habit == null) {
+                            currentRootScreen = RootScreen.Main
+                        } else {
+                            EditHabitScreen(
+                                habit = habit,
+                                onBack = { currentRootScreen = RootScreen.Main },
+                                onSaveHabit = { id, newTitle, newColor ->
+                                    val index = habits.indexOfFirst { it.id == id }
+                                    if (index != -1) {
+                                        val existing = habits[index]
+                                        habits[index] = existing.copy(
+                                            title = newTitle,
+                                            color = newColor
+                                        )
+                                        habitToEdit = habits[index]
+                                    }
+                                    currentRootScreen = RootScreen.Main
+                                },
+                                onDeleteHabit = { id ->
+                                    val index = habits.indexOfFirst { it.id == id }
+                                    if (index != -1) {
+                                        habits.removeAt(index)
+                                    }
+                                    habitToEdit = null
+                                    currentRootScreen = RootScreen.Main
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -290,7 +343,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DailyScreen(
     habits: List<Habit>,
-    onToggleHabitToday: (Habit) -> Unit
+    onToggleHabitToday: (Habit) -> Unit,
+    onHabitClick: (Habit) -> Unit
 ) {
     val today = LocalDate.now().toEpochDay()
 
@@ -323,7 +377,8 @@ fun DailyScreen(
                     HabitCard(
                         habit = habit,
                         isCompletedToday = isCompletedToday,
-                        onToggleHabit = { onToggleHabitToday(habit) }
+                        onToggleHabit = { onToggleHabitToday(habit) },
+                        onClick = { onHabitClick(habit) }
                     )
                 }
             }
@@ -334,7 +389,8 @@ fun DailyScreen(
 @Composable
 fun WeeklyScreen(
     habits: List<Habit>,
-    onToggleHabitForDate: (Habit, LocalDate) -> Unit
+    onToggleHabitForDate: (Habit, LocalDate) -> Unit,
+    onHabitClick: (Habit) -> Unit
 ) {
     if (habits.isEmpty()) {
         Box(
@@ -361,7 +417,8 @@ fun WeeklyScreen(
                     habit = habit,
                     onToggleForDate = { date ->
                         onToggleHabitForDate(habit, date)
-                    }
+                    },
+                    onClick = { onHabitClick(habit) }
                 )
             }
         }
@@ -371,7 +428,8 @@ fun WeeklyScreen(
 @Composable
 fun OverallScreen(
     habits: List<Habit>,
-    onToggleHabitToday: (Habit) -> Unit
+    onToggleHabitToday: (Habit) -> Unit,
+    onHabitClick: (Habit) -> Unit
 ) {
     if (habits.isEmpty()) {
         Box(
@@ -396,7 +454,8 @@ fun OverallScreen(
             items(habits) { habit ->
                 OverallHabitCard(
                     habit = habit,
-                    onToggleToday = { onToggleHabitToday(habit) }
+                    onToggleToday = { onToggleHabitToday(habit) },
+                    onClick = { onHabitClick(habit) }
                 )
             }
         }
@@ -491,12 +550,14 @@ fun DateHeader() {
 fun HabitCard(
     habit: Habit,
     isCompletedToday: Boolean,
-    onToggleHabit: () -> Unit
+    onToggleHabit: () -> Unit,
+    onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp)),
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = habit.color)
     ) {
         Row(
@@ -527,7 +588,8 @@ fun HabitCard(
 @Composable
 fun WeeklyHabitCard(
     habit: Habit,
-    onToggleForDate: (LocalDate) -> Unit
+    onToggleForDate: (LocalDate) -> Unit,
+    onClick: () -> Unit
 ) {
     val today = LocalDate.now()
     val dates = (6 downTo 0).map { today.minusDays(it.toLong()) } // 7 днів, від старшого до сьогодні
@@ -535,7 +597,8 @@ fun WeeklyHabitCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp)),
+            .clip(RoundedCornerShape(20.dp))
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -635,14 +698,16 @@ fun DateCircle(
 @Composable
 fun OverallHabitCard(
     habit: Habit,
-    onToggleToday: () -> Unit
+    onToggleToday: () -> Unit,
+    onClick: () -> Unit
 ) {
     val todayKey = LocalDate.now().toEpochDay()
     val isCompletedToday = habit.completedDates.contains(todayKey)
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp)),
+            .clip(RoundedCornerShape(20.dp))
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -752,6 +817,40 @@ fun AddHabitScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditHabitScreen(
+    habit: Habit,
+    onBack: () -> Unit,
+    onSaveHabit: (Int, String, Color) -> Unit,
+    onDeleteHabit: (Int) -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Редагувати звичку") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Назад"
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        EditHabitContent(
+            habit = habit,
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            onSaveHabit = onSaveHabit,
+            onDeleteHabit = onDeleteHabit
+        )
+    }
+}
+
 @Composable
 fun AddHabitContent(
     modifier: Modifier = Modifier,
@@ -857,6 +956,140 @@ fun AddHabitContent(
 }
 
 @Composable
+fun EditHabitContent(
+    habit: Habit,
+    modifier: Modifier = Modifier,
+    onSaveHabit: (Int, String, Color) -> Unit,
+    onDeleteHabit: (Int) -> Unit
+) {
+    var title by remember(habit.id) { mutableStateOf(habit.title) }
+    var motivation by remember { mutableStateOf("") }
+    var reminderEnabled by remember { mutableStateOf(false) }
+    var deleteChecked by remember(habit.id) { mutableStateOf(false) }
+
+    val habitColors = listOf(
+        Purple,
+        Color(0xFFFFC75F),
+        Color(0xFF709CFF),
+        Color(0xFFFF6F91),
+        Color(0xFFFF9671),
+        Color(0xFFB0BEC5)
+    )
+    var selectedColor by remember(habit.id) { mutableStateOf(habit.color) }
+
+    Column(
+        modifier = modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        OutlinedTextField(
+            value = title,
+            onValueChange = { title = it },
+            label = { Text("Назва звички") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Text(text = "Я буду робити це в")
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб").forEach { day ->
+                DayChip(text = day)
+            }
+        }
+
+        OutlinedTextField(
+            value = motivation,
+            onValueChange = { motivation = it },
+            label = { Text("Що мене мотивуватиме?") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Нагадати мені",
+                modifier = Modifier.weight(1f)
+            )
+            Switch(
+                checked = reminderEnabled,
+                onCheckedChange = { reminderEnabled = it }
+            )
+        }
+
+        Text(
+            text = "Встановити нагадування на 12:00",
+            color = if (reminderEnabled) Color.Black else Color.Gray
+        )
+
+        Text(text = "Вибрати колір")
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            habitColors.forEach { color ->
+                ColorCircle(
+                    color = color,
+                    selected = color == selectedColor,
+                    onClick = { selectedColor = color }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { deleteChecked = !deleteChecked },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Видалити звичку",
+                color = Color(0xFFFF3B30),
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Checkbox(
+                checked = deleteChecked,
+                onCheckedChange = { deleteChecked = it },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = Color(0xFFFF3B30),
+                    checkmarkColor = Color.White,
+                    uncheckedColor = Color(0xFFFF3B30)
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                if (deleteChecked) {
+                    onDeleteHabit(habit.id)
+                } else if (title.isNotBlank()) {
+                    onSaveHabit(habit.id, title, selectedColor)
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(50),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Purple,
+                contentColor = Color.White
+            )
+        ) {
+            Text(text = "Зберегти")
+        }
+    }
+}
+
+@Composable
 fun DayChip(text: String) {
     Box(
         modifier = Modifier
@@ -902,7 +1135,8 @@ fun GreetingPreview() {
                 Habit(id = 0, title = "Пити воду", color = Purple),
                 Habit(id = 1, title = "Читати книгу", color = Color(0xFFFF6F91))
             ),
-            onToggleHabitToday = {}
+            onToggleHabitToday = {},
+            onHabitClick = {}
         )
     }
 }
