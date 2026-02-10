@@ -52,11 +52,11 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,6 +66,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.goodhabits.data.Habit
 import com.example.goodhabits.ui.theme.GoodHabitsTheme
 import com.example.goodhabits.ui.theme.GreyBlue
 import com.example.goodhabits.ui.theme.Purple
@@ -81,19 +83,6 @@ enum class TabScreen(val title: String) {
     Overall("Загалом")
 }
 
-enum class RootScreen {
-    Main,
-    AddHabit,
-    EditHabit
-}
-
-data class Habit(
-    val id: Int,
-    val title: String,
-    val color: Color,
-    val completedDates: Set<Long> = emptySet()
-)
-
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,104 +90,116 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GoodHabitsTheme {
-                var currentRootScreen by remember { mutableStateOf(RootScreen.Main) }
-                var nextHabitId by remember { mutableIntStateOf(0) }
-                val habits = remember { mutableStateListOf<Habit>() }
-                var habitToEdit by remember { mutableStateOf<Habit?>(null) }
+                val viewModel: HabitViewModel = viewModel()
+                val habitsState by viewModel.habits.collectAsState()
 
-                val toggleHabitForDate: (Habit, LocalDate) -> Unit = { habit, date ->
-                    val index = habits.indexOfFirst { it.id == habit.id }
-                    if (index != -1) {
-                        val current = habits[index]
-                        val key = date.toEpochDay()
-                        val updatedDates = current.completedDates.toMutableSet()
-                        if (updatedDates.contains(key)) {
-                            updatedDates.remove(key)
-                        } else {
-                            updatedDates.add(key)
-                        }
-                        habits[index] = current.copy(completedDates = updatedDates)
+                HabitApp(
+                    habits = habitsState,
+                    currentRootScreen = viewModel.currentRootScreen,
+                    habitToEdit = viewModel.habitToEdit,
+                    onOpenAddHabit = { viewModel.openAddHabit() },
+                    onOpenEditHabit = { habit -> viewModel.openEditHabit(habit) },
+                    onBackToMain = { viewModel.backToMain() },
+                    onAddHabit = { title, color -> viewModel.addHabit(title, color) },
+                    onUpdateHabit = { id, title, color -> viewModel.updateHabit(id, title, color) },
+                    onDeleteHabit = { id -> viewModel.deleteHabit(id) },
+                    onToggleHabitToday = { habitId -> viewModel.toggleHabitToday(habitId) },
+                    onToggleHabitForDate = { habitId, date -> viewModel.toggleHabitForDate(habitId, date) }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HabitApp(
+    habits: List<Habit>,
+    currentRootScreen: RootScreen,
+    habitToEdit: Habit?,
+    onOpenAddHabit: () -> Unit,
+    onOpenEditHabit: (Habit) -> Unit,
+    onBackToMain: () -> Unit,
+    onAddHabit: (String, Color) -> Unit,
+    onUpdateHabit: (Int, String, Color) -> Unit,
+    onDeleteHabit: (Int) -> Unit,
+    onToggleHabitToday: (Int) -> Unit,
+    onToggleHabitForDate: (Int, LocalDate) -> Unit
+) {
+    when (currentRootScreen) {
+        RootScreen.Main -> {
+            val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
+            val scope = rememberCoroutineScope()
+            var selectedTabIndex by androidx.compose.runtime.remember { mutableIntStateOf(0) }
+
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    ModalDrawerSheet {
+                        Text("Звички", modifier = Modifier.padding(16.dp))
+                        NavigationDrawerItem(
+                            label = { Text("Ідеї") },
+                            selected = false,
+                            onClick = {
+                                scope.launch { drawerState.close() }
+                            }
+                        )
+                        NavigationDrawerItem(
+                            label = { Text("Аналітика") },
+                            selected = false,
+                            onClick = {
+                                scope.launch { drawerState.close() }
+                            }
+                        )
+                        NavigationDrawerItem(
+                            label = { Text("Налаштування") },
+                            selected = false,
+                            onClick = {
+                                scope.launch { drawerState.close() }
+                            }
+                        )
                     }
-                }
-
-                when (currentRootScreen) {
-                    RootScreen.Main -> {
-                val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
-                val scope = rememberCoroutineScope()
-                var selectedTabIndex by remember { mutableIntStateOf(0) }
-
-                ModalNavigationDrawer(
-                    drawerState = drawerState,
-                    drawerContent = {
-                        ModalDrawerSheet {
-                            Text("Звички", modifier = Modifier.padding(16.dp))
-                            NavigationDrawerItem(
-                                label = { Text("Ідеї") },
-                                selected = false,
-                                onClick = {
-                                    scope.launch { drawerState.close() }
-                                }
-                            )
-                            NavigationDrawerItem(
-                                label = { Text("Аналітика") },
-                                selected = false,
-                                onClick = {
-                                    scope.launch { drawerState.close() }
-                                }
-                            )
-                            NavigationDrawerItem(
-                                label = { Text("Налаштування") },
-                                selected = false,
-                                onClick = {
-                                    scope.launch { drawerState.close() }
-                                }
-                            )
-                        }
-                    },
-                    gesturesEnabled = true
-                ) {
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize(),
-                        topBar = {
-                            TopAppBar(
-                                title = { Text("Звички") },
-                                navigationIcon = {
-                                    IconButton(onClick = {
-                                        scope.launch {
-                                            if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                                        }
-                                    }) {
-                                        Icon(Icons.Filled.Menu, contentDescription = "Menu")
+                },
+                gesturesEnabled = true
+            ) {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = {
+                        TopAppBar(
+                            title = { Text("Звички") },
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    scope.launch {
+                                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
                                     }
-                                        },
-                                        actions = {
-                                            IconButton(onClick = {
-                                                currentRootScreen = RootScreen.AddHabit
-                                            }) {
-                                                Icon(
-                                                    imageVector = Icons.Filled.Add,
-                                                    contentDescription = "Додати звичку"
-                                                )
-                                    }
+                                }) {
+                                    Icon(Icons.Filled.Menu, contentDescription = "Menu")
+                                }
+                            },
+                            actions = {
+                                IconButton(onClick = onOpenAddHabit) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Add,
+                                        contentDescription = "Додати звичку"
+                                    )
+                                }
+                            }
+                        )
+                    }
+                ) { innerPadding ->
+                    Column(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize()
+                    ) {
+                        if (habits.isEmpty()) {
+                            EmptyHabitsContent(
+                                onCreateClick = onOpenAddHabit,
+                                onIdeasClick = {
+                                    // TODO: відкривати екран з ідеями
                                 }
                             )
-                        }
-                    ) { innerPadding ->
-                                Column(
-                                    modifier = Modifier
-                                        .padding(innerPadding)
-                                        .fillMaxSize()
-                                ) {
-                                    if (habits.isEmpty()) {
-                                        EmptyHabitsContent(
-                                            onCreateClick = {
-                                                currentRootScreen = RootScreen.AddHabit
-                                            },
-                                            onIdeasClick = {
-                                                // TODO: відкривати екран з ідеями
-                                            }
-                                        )
-                                    } else {
+                        } else {
                             TabRow(
                                 selectedTabIndex = selectedTabIndex,
                                 modifier = Modifier
@@ -224,7 +225,7 @@ class MainActivity : ComponentActivity() {
                                     ) {
                                         Box(
                                             modifier = Modifier.padding(vertical = 10.dp),
-                                                        contentAlignment = Alignment.Center
+                                            contentAlignment = Alignment.Center
                                         ) {
                                             Text(
                                                 text = screen.title,
@@ -235,105 +236,60 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
-                                        Crossfade(
-                                            targetState = selectedTabIndex,
-                                            label = "TabContentCrossfade"
-                                        ) { targetIndex ->
+                            Crossfade(
+                                targetState = selectedTabIndex,
+                                label = "TabContentCrossfade"
+                            ) { targetIndex ->
                                 when (TabScreen.entries[targetIndex]) {
-                                                TabScreen.Daily -> DailyScreen(
-                                                    habits = habits,
-                                                    onToggleHabitToday = { habit ->
-                                                        toggleHabitForDate(
-                                                            habit,
-                                                            LocalDate.now()
-                                                        )
-                                                    },
-                                                    onHabitClick = { habit ->
-                                                        habitToEdit = habit
-                                                        currentRootScreen = RootScreen.EditHabit
-                                                    }
-                                                )
-
-                                                TabScreen.Weekly -> WeeklyScreen(
-                                                    habits = habits,
-                                                    onToggleHabitForDate = { habit, date ->
-                                                        toggleHabitForDate(habit, date)
-                                                    },
-                                                    onHabitClick = { habit ->
-                                                        habitToEdit = habit
-                                                        currentRootScreen = RootScreen.EditHabit
-                                                    }
-                                                )
-
-                                                TabScreen.Overall -> OverallScreen(
-                                                    habits = habits,
-                                                    onToggleHabitToday = { habit ->
-                                                        toggleHabitForDate(
-                                                            habit,
-                                                            LocalDate.now()
-                                                        )
-                                                    },
-                                                    onHabitClick = { habit ->
-                                                        habitToEdit = habit
-                                                        currentRootScreen = RootScreen.EditHabit
-                                                    }
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    RootScreen.AddHabit -> {
-                        AddHabitScreen(
-                            onBack = { currentRootScreen = RootScreen.Main },
-                            onSaveHabit = { title, color ->
-                                habits.add(
-                                    Habit(
-                                        id = nextHabitId++,
-                                        title = title,
-                                        color = color
+                                    TabScreen.Daily -> DailyScreen(
+                                        habits = habits,
+                                        onToggleHabitToday = { habit ->
+                                            onToggleHabitToday(habit.id)
+                                        },
+                                        onHabitClick = onOpenEditHabit
                                     )
-                                )
-                                currentRootScreen = RootScreen.Main
-                            }
-                        )
-                    }
 
-                    RootScreen.EditHabit -> {
-                        val habit = habitToEdit
-                        if (habit == null) {
-                            currentRootScreen = RootScreen.Main
-                        } else {
-                            EditHabitScreen(
-                                habit = habit,
-                                onBack = { currentRootScreen = RootScreen.Main },
-                                onSaveHabit = { id, newTitle, newColor ->
-                                    val index = habits.indexOfFirst { it.id == id }
-                                    if (index != -1) {
-                                        val existing = habits[index]
-                                        habits[index] = existing.copy(
-                                            title = newTitle,
-                                            color = newColor
-                                        )
-                                        habitToEdit = habits[index]
-                                    }
-                                    currentRootScreen = RootScreen.Main
-                                },
-                                onDeleteHabit = { id ->
-                                    val index = habits.indexOfFirst { it.id == id }
-                                    if (index != -1) {
-                                        habits.removeAt(index)
-                                    }
-                                    habitToEdit = null
-                                    currentRootScreen = RootScreen.Main
+                                    TabScreen.Weekly -> WeeklyScreen(
+                                        habits = habits,
+                                        onToggleHabitForDate = { habit, date ->
+                                            onToggleHabitForDate(habit.id, date)
+                                        },
+                                        onHabitClick = onOpenEditHabit
+                                    )
+
+                                    TabScreen.Overall -> OverallScreen(
+                                        habits = habits,
+                                        onToggleHabitToday = { habit ->
+                                            onToggleHabitToday(habit.id)
+                                        },
+                                        onHabitClick = onOpenEditHabit
+                                    )
                                 }
-                            )
+                            }
                         }
                     }
                 }
+            }
+        }
+
+        RootScreen.AddHabit -> {
+            AddHabitScreen(
+                onBack = onBackToMain,
+                onSaveHabit = onAddHabit
+            )
+        }
+
+        RootScreen.EditHabit -> {
+            val habit = habitToEdit
+            if (habit == null) {
+                onBackToMain()
+            } else {
+                EditHabitScreen(
+                    habit = habit,
+                    onBack = onBackToMain,
+                    onSaveHabit = onUpdateHabit,
+                    onDeleteHabit = onDeleteHabit
+                )
             }
         }
     }
