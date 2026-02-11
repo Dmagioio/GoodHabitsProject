@@ -1,74 +1,62 @@
 package com.example.goodhabits
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.example.goodhabits.data.Habit
 import com.example.goodhabits.data.HabitRepository
-import kotlinx.coroutines.flow.SharingStarted
+import com.example.goodhabits.ui.navigation.RootScreen
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.LocalDate
-
-enum class RootScreen {
-    Main,
-    AddHabit,
-    EditHabit
-}
-
-/**
- * ViewModel – зберігає стан і бізнес-логіку додатку.
- */
+data class HabitUiState(
+    val habits: List<Habit> = emptyList(),
+    val currentScreen: RootScreen = RootScreen.Main,
+    val habitToEdit: Habit? = null
+)
 class HabitViewModel(
     private val repository: HabitRepository = HabitRepository()
 ) : ViewModel() {
 
-    // Поточний список звичок, який спостерігає UI.
-    val habits: StateFlow<List<Habit>> =
-        repository.habits.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = emptyList()
-        )
+    private val _uiState = MutableStateFlow(HabitUiState())
+    val uiState: StateFlow<HabitUiState> = _uiState
 
-    // Поточний екран (головний / створення / редагування)
-    var currentRootScreen by mutableStateOf(RootScreen.Main)
-        private set
-
-    // Поточна звичка для редагування (якщо є)
-    var habitToEdit by mutableStateOf<Habit?>(null)
-        private set
+    init {
+        viewModelScope.launch {
+            repository.habits.collect { list ->
+                _uiState.update { state -> state.copy(habits = list) }
+            }
+        }
+    }
 
     fun openAddHabit() {
-        currentRootScreen = RootScreen.AddHabit
+        _uiState.update { it.copy(currentScreen = RootScreen.AddHabit) }
     }
 
     fun openEditHabit(habit: Habit) {
-        habitToEdit = habit
-        currentRootScreen = RootScreen.EditHabit
+        _uiState.update { it.copy(currentScreen = RootScreen.EditHabit, habitToEdit = habit) }
     }
 
     fun backToMain() {
-        currentRootScreen = RootScreen.Main
-        habitToEdit = null
+        _uiState.update { it.copy(currentScreen = RootScreen.Main, habitToEdit = null) }
     }
 
     fun addHabit(title: String, color: Color) {
-        repository.addHabit(title, color)
-        currentRootScreen = RootScreen.Main
+        repository.addHabit(title, color.toArgb().toLong())
+        backToMain()
     }
 
     fun updateHabit(id: Int, title: String, color: Color) {
-        repository.updateHabit(id, title, color)
-        currentRootScreen = RootScreen.Main
+        repository.updateHabit(id, title, color.toArgb().toLong())
+        backToMain()
     }
 
     fun deleteHabit(id: Int) {
         repository.deleteHabit(id)
-        currentRootScreen = RootScreen.Main
+        backToMain()
     }
 
     fun toggleHabitToday(habitId: Int) {

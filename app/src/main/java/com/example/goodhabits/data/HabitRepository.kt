@@ -1,16 +1,11 @@
 package com.example.goodhabits.data
 
-import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.time.LocalDate
 
-/**
- * Простий in-memory репозиторій для звичок.
- * З часом його можна замінити на Room / мережу тощо.
- */
 class HabitRepository {
 
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
@@ -18,19 +13,19 @@ class HabitRepository {
 
     private var nextHabitId: Int = 0
 
-    fun addHabit(title: String, color: Color) {
+    fun addHabit(title: String, colorHex: Long) {
         val newHabit = Habit(
             id = nextHabitId++,
             title = title,
-            color = color
+            colorHex = colorHex
         )
         _habits.update { it + newHabit }
     }
 
-    fun updateHabit(id: Int, title: String, color: Color) {
+    fun updateHabit(id: Int, title: String, colorHex: Long) {
         _habits.update { list ->
             list.map { habit ->
-                if (habit.id == id) habit.copy(title = title, color = color) else habit
+                if (habit.id == id) habit.copy(title = title, colorHex = colorHex) else habit
             }
         }
     }

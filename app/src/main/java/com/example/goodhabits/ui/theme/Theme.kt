@@ -16,16 +16,16 @@ private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
     tertiary = Pink80,
-    background = Color(0xFF1C1C1C) // Dark background color
+    background = Color(0xFF1C1C1C)
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    background = Color(0xFFF0F0F0) // Light background color
+    background = Color(0xFFF0F0F0)
 
-    /* Other default colors to override
+    /*
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
     onPrimary = Color.White,
@@ -39,7 +39,6 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun GoodHabitsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
