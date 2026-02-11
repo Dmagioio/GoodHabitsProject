@@ -147,9 +147,11 @@ fun MainScreen(
                     },
                     actions = {
                         IconButton(onClick = onOpenAddHabit) {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = "Додати звичку"
+                            Text(
+                                text = "+",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontSize = MaterialTheme.typography.titleLarge.fontSize * 1.4f
+                                )
                             )
                         }
                     }
