@@ -37,7 +37,13 @@ import androidx.compose.ui.unit.dp
 import com.example.goodhabits.data.Habit
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
+import com.example.goodhabits.ui.theme.LightBlue
+import com.example.goodhabits.ui.theme.LightGrey
+import com.example.goodhabits.ui.theme.Orang
+import com.example.goodhabits.ui.theme.Pink
 import com.example.goodhabits.ui.theme.Purple
+import com.example.goodhabits.ui.theme.Red
+import com.example.goodhabits.ui.theme.Yellow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,11 +93,12 @@ fun EditHabitContent(
 
     val habitColors = listOf(
         Purple,
-        Color(0xFFFFC75F),
-        Color(0xFF709CFF),
-        Color(0xFFFF6F91),
-        Color(0xFFFF9671),
-        Color(0xFFB0BEC5)
+        Yellow,
+        LightBlue,
+        Pink,
+        Orang,
+        LightGrey,
+        Red,
     )
     var selectedColor by remember(habit.id) { mutableStateOf(Color(habit.colorHex.toInt())) }
 
@@ -168,7 +175,7 @@ fun EditHabitContent(
         ) {
             Text(
                 text = "Видалити звичку",
-                color = Color(0xFFFF3B30),
+                color = Red,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -176,9 +183,9 @@ fun EditHabitContent(
                 checked = deleteChecked,
                 onCheckedChange = { deleteChecked = it },
                 colors = CheckboxDefaults.colors(
-                    checkedColor = Color(0xFFFF3B30),
+                    checkedColor = Red,
                     checkmarkColor = Color.White,
-                    uncheckedColor = Color(0xFFFF3B30)
+                    uncheckedColor = Red,
                 )
             )
         }

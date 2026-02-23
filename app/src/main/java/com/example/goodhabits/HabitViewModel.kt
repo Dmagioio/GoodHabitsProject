@@ -67,4 +67,3 @@ class HabitViewModel(
         repository.toggleHabitForDate(habitId, date)
     }
 }
-

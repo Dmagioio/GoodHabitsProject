@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.goodhabits.ui.theme.LightBlue
 import com.example.goodhabits.ui.theme.Purple
 
 @Composable
@@ -63,8 +64,8 @@ fun EmptyHabitsContent(
             onClick = onIdeasClick,
             shape = RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF3D7BFF),
-                contentColor = Color.White
+                containerColor = LightBlue,
+                contentColor = Color.White,
             )
         ) {
             Text(text = "Вибрати з ідей")

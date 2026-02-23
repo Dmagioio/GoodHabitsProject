@@ -32,7 +32,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
+import com.example.goodhabits.ui.theme.LightBlue
+import com.example.goodhabits.ui.theme.LightGrey
+import com.example.goodhabits.ui.theme.Orang
+import com.example.goodhabits.ui.theme.Pink
 import com.example.goodhabits.ui.theme.Purple
+import com.example.goodhabits.ui.theme.Red
+import com.example.goodhabits.ui.theme.Yellow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,11 +81,12 @@ fun AddHabitContent(
 
     val habitColors = listOf(
         Purple,
-        Color(0xFFFFC75F),
-        Color(0xFF709CFF),
-        Color(0xFFFF6F91),
-        Color(0xFFFF9671),
-        Color(0xFFB0BEC5)
+        Yellow,
+        LightBlue,
+        Pink,
+        Orang,
+        LightGrey,
+        Red,
     )
     var selectedColor by remember { mutableStateOf(habitColors.first()) }
 

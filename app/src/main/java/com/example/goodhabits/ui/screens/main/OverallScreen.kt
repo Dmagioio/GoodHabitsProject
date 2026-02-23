@@ -15,8 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.goodhabits.data.Habit
 import com.example.goodhabits.ui.components.OverallHabitCard
-import java.time.LocalDate
-
 @Composable
 fun OverallScreen(
     habits: List<Habit>,
