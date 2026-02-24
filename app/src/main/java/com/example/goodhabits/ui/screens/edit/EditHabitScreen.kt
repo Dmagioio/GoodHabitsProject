@@ -102,6 +102,10 @@ fun EditHabitContent(
     )
     var selectedColor by remember(habit.id) { mutableStateOf(Color(habit.colorHex.toInt())) }
 
+    val habitDays = listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб")
+
+    var selectedDays by remember { mutableStateOf(setOf<String>()) }
+
     Column(
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -120,8 +124,18 @@ fun EditHabitContent(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб").forEach { day ->
-                DayChip(text = day)
+            habitDays.forEach { day ->
+                DayChip(
+                    text = day,
+                    isSelected = selectedDays.contains(day),
+                    onClick = {
+                        selectedDays = if (selectedDays.contains(day)) {
+                            selectedDays - day
+                        } else {
+                            selectedDays + day
+                        }
+                    }
+                )
             }
         }
 
