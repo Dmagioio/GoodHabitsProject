@@ -44,7 +44,7 @@ import com.example.goodhabits.ui.theme.Yellow
 @Composable
 fun AddHabitScreen(
     onBack: () -> Unit,
-    onSaveHabit: (String, Color) -> Unit
+    onSaveHabit: (String, Color, Set<String>) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -73,7 +73,7 @@ fun AddHabitScreen(
 @Composable
 fun AddHabitContent(
     modifier: Modifier = Modifier,
-    onSaveHabit: (String, Color) -> Unit
+    onSaveHabit: (String, Color, Set<String>) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var motivation by remember { mutableStateOf("") }
@@ -173,7 +173,7 @@ fun AddHabitContent(
         Button(
             onClick = {
                 if (title.isNotBlank()) {
-                    onSaveHabit(title, selectedColor)
+                    onSaveHabit(title, selectedColor, selectedDays)
                 }
             },
             modifier = Modifier

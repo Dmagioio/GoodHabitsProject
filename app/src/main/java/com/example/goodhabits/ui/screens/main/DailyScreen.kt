@@ -29,6 +29,17 @@ fun DailyScreen(
 ) {
     val today = LocalDate.now().toEpochDay()
 
+    val todayNow = LocalDate.now()
+    val dayOfWeek = todayNow.dayOfWeek.getDisplayName(
+        java.time.format.TextStyle.SHORT,
+        java.util.Locale("uk")
+    ).replaceFirstChar { it.uppercase() }
+
+
+    val filteredHabits = habits.filter { habit ->
+        habit.days.contains(dayOfWeek)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,7 +64,7 @@ fun DailyScreen(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(habits) { habit ->
+                items(filteredHabits) { habit ->
                     val isCompletedToday = habit.completedDates.contains(today)
                     HabitCard(
                         habit = habit,

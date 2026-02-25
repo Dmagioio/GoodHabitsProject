@@ -13,11 +13,13 @@ class HabitRepository {
 
     private var nextHabitId: Int = 0
 
-    fun addHabit(title: String, colorHex: Long) {
+    fun addHabit(title: String, colorHex: Long, days: Set<String>) {
         val newHabit = Habit(
             id = nextHabitId++,
             title = title,
-            colorHex = colorHex
+            colorHex = colorHex,
+            days = days
+
         )
         _habits.update { it + newHabit }
     }

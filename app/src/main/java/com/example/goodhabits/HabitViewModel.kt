@@ -44,8 +44,12 @@ class HabitViewModel(
         _uiState.update { it.copy(currentScreen = RootScreen.Main, habitToEdit = null) }
     }
 
-    fun addHabit(title: String, color: Color) {
-        repository.addHabit(title, color.toArgb().toLong())
+    fun addHabit(title: String, color: Color, days: Set<String>) {
+        repository.addHabit(
+            title = title,
+            colorHex = color.toArgb().toLong(),
+            days = days
+        )
         backToMain()
     }
 
