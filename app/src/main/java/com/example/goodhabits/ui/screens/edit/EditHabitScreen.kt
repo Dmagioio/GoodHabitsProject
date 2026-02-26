@@ -50,7 +50,7 @@ import com.example.goodhabits.ui.theme.Yellow
 fun EditHabitScreen(
     habit: Habit,
     onBack: () -> Unit,
-    onSaveHabit: (Int, String, Color) -> Unit,
+    onSaveHabit: (Int, String, Color, Set<String>) -> Unit,
     onDeleteHabit: (Int) -> Unit
 ) {
     Scaffold(
@@ -83,7 +83,7 @@ fun EditHabitScreen(
 fun EditHabitContent(
     habit: Habit,
     modifier: Modifier = Modifier,
-    onSaveHabit: (Int, String, Color) -> Unit,
+    onSaveHabit: (Int, String, Color, Set<String>) -> Unit,
     onDeleteHabit: (Int) -> Unit
 ) {
     var title by remember(habit.id) { mutableStateOf(habit.title) }
@@ -102,9 +102,7 @@ fun EditHabitContent(
     )
     var selectedColor by remember(habit.id) { mutableStateOf(Color(habit.colorHex.toInt())) }
 
-    val habitDays = listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб")
-
-    var selectedDays by remember { mutableStateOf(setOf<String>()) }
+    var selectedDays by remember { mutableStateOf(habit.days) }
 
     Column(
         modifier = modifier
@@ -120,11 +118,9 @@ fun EditHabitContent(
         )
 
         Text(text = "Я буду робити це в")
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            habitDays.forEach { day ->
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            val allDays = listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб")
+            allDays.forEach { day ->
                 DayChip(
                     text = day,
                     isSelected = selectedDays.contains(day),
@@ -211,7 +207,7 @@ fun EditHabitContent(
                 if (deleteChecked) {
                     onDeleteHabit(habit.id)
                 } else if (title.isNotBlank()) {
-                    onSaveHabit(habit.id, title, selectedColor)
+                    onSaveHabit(habit.id, title, selectedColor, selectedDays,)
                 }
             },
             modifier = Modifier

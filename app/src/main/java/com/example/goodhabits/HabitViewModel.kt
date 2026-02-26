@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import kotlin.String
+
 data class HabitUiState(
     val habits: List<Habit> = emptyList(),
     val currentScreen: RootScreen = RootScreen.Main,
@@ -53,8 +55,13 @@ class HabitViewModel(
         backToMain()
     }
 
-    fun updateHabit(id: Int, title: String, color: Color) {
-        repository.updateHabit(id, title, color.toArgb().toLong())
+    fun updateHabit(id: Int, title: String, color: Color, days: Set<String>) {
+        repository.updateHabit(
+            id = id,
+            title = title,
+            colorHex = color.toArgb().toLong(),
+            days = days
+        )
         backToMain()
     }
 

@@ -22,7 +22,7 @@ fun HabitApp(viewModel: HabitViewModel = viewModel()) {
         onOpenEditHabit = { habit -> viewModel.openEditHabit(habit) },
         onBackToMain = { viewModel.backToMain() },
         onAddHabit = { title, color, days -> viewModel.addHabit(title, color, days) },
-        onUpdateHabit = { id, title, color -> viewModel.updateHabit(id, title, color) },
+        onUpdateHabit = { id, title, color, days -> viewModel.updateHabit(id, title, color, days) },
         onDeleteHabit = { id -> viewModel.deleteHabit(id) },
         onToggleHabitToday = { habitId -> viewModel.toggleHabitToday(habitId) },
         onToggleHabitForDate = { habitId, date -> viewModel.toggleHabitForDate(habitId, date) }
@@ -36,7 +36,7 @@ fun HabitNavHost(
     onOpenEditHabit: (Habit) -> Unit,
     onBackToMain: () -> Unit,
     onAddHabit: (String, Color, Set<String>) -> Unit,
-    onUpdateHabit: (Int, String, Color) -> Unit,
+    onUpdateHabit: (Int, String, Color, Set<String>) -> Unit,
     onDeleteHabit: (Int) -> Unit,
     onToggleHabitToday: (Int) -> Unit,
     onToggleHabitForDate: (Int, LocalDate) -> Unit

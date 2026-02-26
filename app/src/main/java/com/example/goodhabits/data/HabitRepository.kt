@@ -24,10 +24,10 @@ class HabitRepository {
         _habits.update { it + newHabit }
     }
 
-    fun updateHabit(id: Int, title: String, colorHex: Long) {
+    fun updateHabit(id: Int, title: String, colorHex: Long, days: Set<String>) {
         _habits.update { list ->
             list.map { habit ->
-                if (habit.id == id) habit.copy(title = title, colorHex = colorHex) else habit
+                if (habit.id == id) habit.copy(title = title, colorHex = colorHex, days = days) else habit
             }
         }
     }
