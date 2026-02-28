@@ -9,9 +9,11 @@ import com.example.goodhabits.data.HabitRepository
 import com.example.goodhabits.ui.navigation.RootScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
 import kotlin.String
 
 data class HabitUiState(
@@ -25,6 +27,9 @@ class HabitViewModel(
 
     private val _uiState = MutableStateFlow(HabitUiState())
     val uiState: StateFlow<HabitUiState> = _uiState
+
+    private val _reminderTime = MutableStateFlow(LocalTime.of(12, 0))
+    val reminderTime: StateFlow<LocalTime> = _reminderTime.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -63,6 +68,10 @@ class HabitViewModel(
             days = days
         )
         backToMain()
+    }
+
+    fun updateReminderTime(hour: Int, minute: Int) {
+        _reminderTime.value = LocalTime.of(hour, minute)
     }
 
     fun deleteHabit(id: Int) {

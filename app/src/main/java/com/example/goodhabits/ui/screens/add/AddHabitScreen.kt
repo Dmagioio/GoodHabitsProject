@@ -1,5 +1,6 @@
 package com.example.goodhabits.ui.screens.add
 
+import android.app.TimePickerDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,13 +24,17 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.goodhabits.HabitViewModel
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
 import com.example.goodhabits.ui.theme.LightBlue
@@ -44,7 +49,9 @@ import com.example.goodhabits.ui.theme.Yellow
 @Composable
 fun AddHabitScreen(
     onBack: () -> Unit,
-    onSaveHabit: (String, Color, Set<String>) -> Unit
+    onSaveHabit: (String, Color, Set<String>) -> Unit,
+    viewModel: HabitViewModel
+
 ) {
     Scaffold(
         topBar = {
@@ -65,7 +72,8 @@ fun AddHabitScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
-            onSaveHabit = onSaveHabit
+            onSaveHabit = onSaveHabit,
+            viewModel = viewModel
         )
     }
 }
@@ -73,11 +81,27 @@ fun AddHabitScreen(
 @Composable
 fun AddHabitContent(
     modifier: Modifier = Modifier,
-    onSaveHabit: (String, Color, Set<String>) -> Unit
+    onSaveHabit: (String, Color, Set<String>) -> Unit,
+    viewModel: HabitViewModel
 ) {
     var title by remember { mutableStateOf("") }
     var motivation by remember { mutableStateOf("") }
     var reminderEnabled by remember { mutableStateOf(false) }
+
+    val pickedTime by viewModel.reminderTime.collectAsState()
+    val context = LocalContext.current
+
+    val timePickerDialog = remember {
+        TimePickerDialog(
+            context,
+            { _, hour, minute ->
+                viewModel.updateReminderTime(hour, minute)
+            },
+            pickedTime.hour,
+            pickedTime.minute,
+            true
+        )
+    }
 
     val habitColors = listOf(
         Purple,
@@ -89,7 +113,6 @@ fun AddHabitContent(
         Red,
     )
     var selectedColor by remember { mutableStateOf(habitColors.first()) }
-
 
     val habitDays = listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб")
 
@@ -149,10 +172,11 @@ fun AddHabitContent(
             )
         }
 
-        Text(
-            text = "Встановити нагадування на 12:00",
-            color = if (reminderEnabled) Color.Black else Color.Gray
-        )
+        if (reminderEnabled) {
+            Button(onClick = { timePickerDialog.show() }) {
+                Text("Вибрати час: $pickedTime")
+            }
+        }
 
         Text(text = "Вибрати колір")
         Row(

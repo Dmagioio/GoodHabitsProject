@@ -18,6 +18,7 @@ fun HabitApp(viewModel: HabitViewModel = viewModel()) {
 
     HabitNavHost(
         state = state,
+        viewModel = viewModel,
         onOpenAddHabit = { viewModel.openAddHabit() },
         onOpenEditHabit = { habit -> viewModel.openEditHabit(habit) },
         onBackToMain = { viewModel.backToMain() },
@@ -32,6 +33,7 @@ fun HabitApp(viewModel: HabitViewModel = viewModel()) {
 @Composable
 fun HabitNavHost(
     state: HabitUiState,
+    viewModel: HabitViewModel,
     onOpenAddHabit: () -> Unit,
     onOpenEditHabit: (Habit) -> Unit,
     onBackToMain: () -> Unit,
@@ -52,7 +54,8 @@ fun HabitNavHost(
 
         RootScreen.AddHabit -> AddHabitScreen(
             onBack = onBackToMain,
-            onSaveHabit = onAddHabit
+            onSaveHabit = onAddHabit,
+            viewModel = viewModel
         )
 
         RootScreen.EditHabit -> {
@@ -64,7 +67,8 @@ fun HabitNavHost(
                     habit = habit,
                     onBack = onBackToMain,
                     onSaveHabit = onUpdateHabit,
-                    onDeleteHabit = onDeleteHabit
+                    onDeleteHabit = onDeleteHabit,
+
                 )
             }
         }
