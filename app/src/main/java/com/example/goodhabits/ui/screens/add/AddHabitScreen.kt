@@ -33,8 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.goodhabits.HabitViewModel
+import com.example.goodhabits.viewmodel.HabitViewModel
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
 import com.example.goodhabits.ui.theme.LightBlue
@@ -49,7 +48,7 @@ import com.example.goodhabits.ui.theme.Yellow
 @Composable
 fun AddHabitScreen(
     onBack: () -> Unit,
-    onSaveHabit: (String, Color, Set<String>) -> Unit,
+    onSaveHabit: (String, Color, Set<String>, Boolean) -> Unit,
     viewModel: HabitViewModel
 
 ) {
@@ -81,7 +80,7 @@ fun AddHabitScreen(
 @Composable
 fun AddHabitContent(
     modifier: Modifier = Modifier,
-    onSaveHabit: (String, Color, Set<String>) -> Unit,
+    onSaveHabit: (String, Color, Set<String>, Boolean) -> Unit,
     viewModel: HabitViewModel
 ) {
     var title by remember { mutableStateOf("") }
@@ -91,17 +90,17 @@ fun AddHabitContent(
     val pickedTime by viewModel.reminderTime.collectAsState()
     val context = LocalContext.current
 
-    val timePickerDialog = remember {
-        TimePickerDialog(
-            context,
-            { _, hour, minute ->
-                viewModel.updateReminderTime(hour, minute)
-            },
-            pickedTime.hour,
-            pickedTime.minute,
-            true
-        )
-    }
+//    val timePickerDialog = remember {
+//        TimePickerDialog(
+//            context,
+//            { _, hour, minute ->
+//                viewModel.updateReminderTime(hour, minute)
+//            },
+//            pickedTime.hour,
+//            pickedTime.minute,
+//            true
+//        )
+//    }
 
     val habitColors = listOf(
         Purple,
@@ -173,7 +172,17 @@ fun AddHabitContent(
         }
 
         if (reminderEnabled) {
-            Button(onClick = { timePickerDialog.show() }) {
+            Button(onClick = {
+                TimePickerDialog(
+                    context,
+                    { _, hour, minute ->
+                        viewModel.updateReminderTime(hour, minute)
+                    },
+                    pickedTime.hour,
+                    pickedTime.minute,
+                    true
+                ).show()
+            }) {
                 Text("Вибрати час: $pickedTime")
             }
         }
@@ -197,7 +206,7 @@ fun AddHabitContent(
         Button(
             onClick = {
                 if (title.isNotBlank()) {
-                    onSaveHabit(title, selectedColor, selectedDays)
+                    onSaveHabit(title, selectedColor, selectedDays, reminderEnabled)
                 }
             },
             modifier = Modifier

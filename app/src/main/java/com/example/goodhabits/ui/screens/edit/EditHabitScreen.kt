@@ -1,5 +1,6 @@
 package com.example.goodhabits.ui.screens.edit
 
+import android.app.TimePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,13 +28,16 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.goodhabits.viewmodel.HabitViewModel
 import com.example.goodhabits.data.Habit
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
@@ -50,8 +54,9 @@ import com.example.goodhabits.ui.theme.Yellow
 fun EditHabitScreen(
     habit: Habit,
     onBack: () -> Unit,
-    onSaveHabit: (Int, String, Color, Set<String>) -> Unit,
-    onDeleteHabit: (Int) -> Unit
+    onSaveHabit: (Int, String, Color, Set<String>, Boolean) -> Unit,
+    onDeleteHabit: (Int) -> Unit,
+    viewModel: HabitViewModel
 ) {
     Scaffold(
         topBar = {
@@ -74,7 +79,8 @@ fun EditHabitScreen(
                 .padding(innerPadding)
                 .fillMaxSize(),
             onSaveHabit = onSaveHabit,
-            onDeleteHabit = onDeleteHabit
+            onDeleteHabit = onDeleteHabit,
+            viewModel = viewModel
         )
     }
 }
@@ -83,13 +89,17 @@ fun EditHabitScreen(
 fun EditHabitContent(
     habit: Habit,
     modifier: Modifier = Modifier,
-    onSaveHabit: (Int, String, Color, Set<String>) -> Unit,
-    onDeleteHabit: (Int) -> Unit
+    onSaveHabit: (Int, String, Color, Set<String>, Boolean) -> Unit,
+    onDeleteHabit: (Int) -> Unit,
+    viewModel: HabitViewModel
 ) {
     var title by remember(habit.id) { mutableStateOf(habit.title) }
     var motivation by remember { mutableStateOf("") }
     var reminderEnabled by remember { mutableStateOf(false) }
     var deleteChecked by remember(habit.id) { mutableStateOf(false) }
+
+    val pickedTime by viewModel.reminderTime.collectAsState()
+    val context = LocalContext.current
 
     val habitColors = listOf(
         Purple,
@@ -156,10 +166,21 @@ fun EditHabitContent(
             )
         }
 
-        Text(
-            text = "Встановити нагадування на 12:00",
-            color = if (reminderEnabled) Color.Black else Color.Gray
-        )
+        if (reminderEnabled) {
+            Button(onClick = {
+                TimePickerDialog(
+                    context,
+                    { _, hour, minute ->
+                        viewModel.updateReminderTime(hour, minute)
+                    },
+                    pickedTime.hour,
+                    pickedTime.minute,
+                    true
+                ).show()
+            }) {
+                Text("Вибрати час: $pickedTime")
+            }
+        }
 
         Text(text = "Вибрати колір")
         Row(
@@ -207,7 +228,7 @@ fun EditHabitContent(
                 if (deleteChecked) {
                     onDeleteHabit(habit.id)
                 } else if (title.isNotBlank()) {
-                    onSaveHabit(habit.id, title, selectedColor, selectedDays,)
+                    onSaveHabit(habit.id, title, selectedColor, selectedDays, reminderEnabled)
                 }
             },
             modifier = Modifier

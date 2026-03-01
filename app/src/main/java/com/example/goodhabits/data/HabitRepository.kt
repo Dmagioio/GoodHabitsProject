@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.time.LocalDate
+import java.time.LocalTime
 
 class HabitRepository {
 
@@ -13,21 +14,29 @@ class HabitRepository {
 
     private var nextHabitId: Int = 0
 
-    fun addHabit(title: String, colorHex: Long, days: Set<String>) {
+    fun addHabit(title: String, colorHex: Long, days: Set<String>, reminderTime: LocalTime?) {
         val newHabit = Habit(
             id = nextHabitId++,
             title = title,
             colorHex = colorHex,
-            days = days
+            days = days,
+            reminderTime = reminderTime
 
         )
         _habits.update { it + newHabit }
     }
 
-    fun updateHabit(id: Int, title: String, colorHex: Long, days: Set<String>) {
+    fun updateHabit(id: Int, title: String, colorHex: Long, days: Set<String>, reminderTime: LocalTime?) {
         _habits.update { list ->
             list.map { habit ->
-                if (habit.id == id) habit.copy(title = title, colorHex = colorHex, days = days) else habit
+                if (habit.id == id) {
+                    habit.copy(
+                        title = title,
+                        colorHex = colorHex,
+                        days = days,
+                        reminderTime = reminderTime
+                    )
+                } else habit
             }
         }
     }

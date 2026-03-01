@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.goodhabits.HabitUiState
-import com.example.goodhabits.HabitViewModel
+import com.example.goodhabits.viewmodel.HabitUiState
+import com.example.goodhabits.viewmodel.HabitViewModel
 import com.example.goodhabits.data.Habit
 import com.example.goodhabits.ui.screens.add.AddHabitScreen
 import com.example.goodhabits.ui.screens.edit.EditHabitScreen
@@ -22,8 +22,8 @@ fun HabitApp(viewModel: HabitViewModel = viewModel()) {
         onOpenAddHabit = { viewModel.openAddHabit() },
         onOpenEditHabit = { habit -> viewModel.openEditHabit(habit) },
         onBackToMain = { viewModel.backToMain() },
-        onAddHabit = { title, color, days -> viewModel.addHabit(title, color, days) },
-        onUpdateHabit = { id, title, color, days -> viewModel.updateHabit(id, title, color, days) },
+        onAddHabit = { title, color, days, time -> viewModel.addHabit(title, color, days, time) },
+        onUpdateHabit = { id, title, color, days, time -> viewModel.updateHabit(id, title, color, days, time) },
         onDeleteHabit = { id -> viewModel.deleteHabit(id) },
         onToggleHabitToday = { habitId -> viewModel.toggleHabitToday(habitId) },
         onToggleHabitForDate = { habitId, date -> viewModel.toggleHabitForDate(habitId, date) }
@@ -37,8 +37,8 @@ fun HabitNavHost(
     onOpenAddHabit: () -> Unit,
     onOpenEditHabit: (Habit) -> Unit,
     onBackToMain: () -> Unit,
-    onAddHabit: (String, Color, Set<String>) -> Unit,
-    onUpdateHabit: (Int, String, Color, Set<String>) -> Unit,
+    onAddHabit: (String, Color, Set<String>, Boolean) -> Unit,
+    onUpdateHabit: (Int, String, Color, Set<String>, Boolean) -> Unit,
     onDeleteHabit: (Int) -> Unit,
     onToggleHabitToday: (Int) -> Unit,
     onToggleHabitForDate: (Int, LocalDate) -> Unit
@@ -55,7 +55,7 @@ fun HabitNavHost(
         RootScreen.AddHabit -> AddHabitScreen(
             onBack = onBackToMain,
             onSaveHabit = onAddHabit,
-            viewModel = viewModel
+            viewModel = viewModel,
         )
 
         RootScreen.EditHabit -> {
@@ -68,7 +68,7 @@ fun HabitNavHost(
                     onBack = onBackToMain,
                     onSaveHabit = onUpdateHabit,
                     onDeleteHabit = onDeleteHabit,
-
+                    viewModel = viewModel,
                 )
             }
         }

@@ -1,4 +1,4 @@
-package com.example.goodhabits
+package com.example.goodhabits.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -51,21 +51,25 @@ class HabitViewModel(
         _uiState.update { it.copy(currentScreen = RootScreen.Main, habitToEdit = null) }
     }
 
-    fun addHabit(title: String, color: Color, days: Set<String>) {
+    fun addHabit(title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean) {
+        val time = if (isReminderEnabled) _reminderTime.value else null
         repository.addHabit(
             title = title,
             colorHex = color.toArgb().toLong(),
-            days = days
+            days = days,
+            reminderTime = time,
         )
         backToMain()
     }
 
-    fun updateHabit(id: Int, title: String, color: Color, days: Set<String>) {
+    fun updateHabit(id: Int, title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean) {
+        val time = if (isReminderEnabled) _reminderTime.value else null
         repository.updateHabit(
             id = id,
             title = title,
             colorHex = color.toArgb().toLong(),
-            days = days
+            days = days,
+            reminderTime = time,
         )
         backToMain()
     }
