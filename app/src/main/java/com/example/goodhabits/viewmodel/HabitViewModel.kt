@@ -1,11 +1,13 @@
 package com.example.goodhabits.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.example.goodhabits.data.Habit
 import com.example.goodhabits.data.HabitRepository
+import com.example.goodhabits.notifications.AlarmScheduler
 import com.example.goodhabits.ui.navigation.RootScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,18 +53,24 @@ class HabitViewModel(
         _uiState.update { it.copy(currentScreen = RootScreen.Main, habitToEdit = null) }
     }
 
-    fun addHabit(title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean) {
+    fun addHabit(context: Context, title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean) {
         val time = if (isReminderEnabled) _reminderTime.value else null
-        repository.addHabit(
+        val newId = repository.addHabit(
             title = title,
             colorHex = color.toArgb().toLong(),
             days = days,
             reminderTime = time,
         )
+
+        val scheduler = AlarmScheduler(context)
+        if (isReminderEnabled && time != null) {
+            scheduler.schedule(newId, title, time)
+        } else scheduler.cancel(newId)
+
         backToMain()
     }
 
-    fun updateHabit(id: Int, title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean) {
+    fun updateHabit(context: Context, id: Int, title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean) {
         val time = if (isReminderEnabled) _reminderTime.value else null
         repository.updateHabit(
             id = id,
@@ -71,6 +79,12 @@ class HabitViewModel(
             days = days,
             reminderTime = time,
         )
+
+        val scheduler = AlarmScheduler(context)
+        if (isReminderEnabled && time != null) {
+            scheduler.schedule(id, title, time)
+        } else scheduler.cancel(id)
+
         backToMain()
     }
 

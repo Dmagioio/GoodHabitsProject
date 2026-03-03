@@ -11,10 +11,13 @@ import com.example.goodhabits.ui.screens.add.AddHabitScreen
 import com.example.goodhabits.ui.screens.edit.EditHabitScreen
 import com.example.goodhabits.ui.screens.main.MainScreen
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import java.time.LocalDate
 @Composable
 fun HabitApp(viewModel: HabitViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsState()
+
+    val context = LocalContext.current
 
     HabitNavHost(
         state = state,
@@ -22,8 +25,8 @@ fun HabitApp(viewModel: HabitViewModel = viewModel()) {
         onOpenAddHabit = { viewModel.openAddHabit() },
         onOpenEditHabit = { habit -> viewModel.openEditHabit(habit) },
         onBackToMain = { viewModel.backToMain() },
-        onAddHabit = { title, color, days, time -> viewModel.addHabit(title, color, days, time) },
-        onUpdateHabit = { id, title, color, days, time -> viewModel.updateHabit(id, title, color, days, time) },
+        onAddHabit = {title, color, days, time -> viewModel.addHabit(context, title, color, days, time) },
+        onUpdateHabit = {id, title, color, days, time -> viewModel.updateHabit(context, id, title, color, days, time) },
         onDeleteHabit = { id -> viewModel.deleteHabit(id) },
         onToggleHabitToday = { habitId -> viewModel.toggleHabitToday(habitId) },
         onToggleHabitForDate = { habitId, date -> viewModel.toggleHabitForDate(habitId, date) }

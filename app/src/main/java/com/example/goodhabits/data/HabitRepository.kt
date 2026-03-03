@@ -14,7 +14,7 @@ class HabitRepository {
 
     private var nextHabitId: Int = 0
 
-    fun addHabit(title: String, colorHex: Long, days: Set<String>, reminderTime: LocalTime?) {
+    fun addHabit(title: String, colorHex: Long, days: Set<String>, reminderTime: LocalTime?): Int {
         val newHabit = Habit(
             id = nextHabitId++,
             title = title,
@@ -24,6 +24,8 @@ class HabitRepository {
 
         )
         _habits.update { it + newHabit }
+
+        return newHabit.id
     }
 
     fun updateHabit(id: Int, title: String, colorHex: Long, days: Set<String>, reminderTime: LocalTime?) {
