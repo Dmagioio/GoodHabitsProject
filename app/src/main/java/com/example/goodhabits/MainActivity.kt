@@ -8,7 +8,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import com.example.goodhabits.ui.navigation.HabitApp
 import com.example.goodhabits.ui.theme.GoodHabitsTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -37,13 +37,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.goodhabits.R
 import com.example.goodhabits.viewmodel.HabitViewModel
-import com.example.goodhabits.data.Habit
+import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
 import com.example.goodhabits.ui.theme.LightBlue
 import com.example.goodhabits.ui.theme.LightGrey
-import com.example.goodhabits.ui.theme.Orang
+import com.example.goodhabits.ui.theme.Orange
 import com.example.goodhabits.ui.theme.Pink
 import com.example.goodhabits.ui.theme.Purple
 import com.example.goodhabits.ui.theme.Red
@@ -61,12 +63,12 @@ fun EditHabitScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Редагувати звичку") },
+                title = { Text(stringResource(R.string.edit_habit_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Назад"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 }
@@ -76,7 +78,7 @@ fun EditHabitScreen(
         EditHabitContent(
             habit = habit,
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(innerPadding)            
                 .fillMaxSize(),
             onSaveHabit = onSaveHabit,
             onDeleteHabit = onDeleteHabit,
@@ -106,7 +108,7 @@ fun EditHabitContent(
         Yellow,
         LightBlue,
         Pink,
-        Orang,
+        Orange,
         LightGrey,
         Red,
     )
@@ -123,11 +125,11 @@ fun EditHabitContent(
         OutlinedTextField(
             value = title,
             onValueChange = { title = it },
-            label = { Text("Назва звички") },
+            label = { Text(stringResource(R.string.habit_name_label)) },
             modifier = Modifier.fillMaxWidth()
         )
 
-        Text(text = "Я буду робити це в")
+        Text(text = stringResource(R.string.do_it_on))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             val allDays = listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб")
             allDays.forEach { day ->
@@ -148,7 +150,7 @@ fun EditHabitContent(
         OutlinedTextField(
             value = motivation,
             onValueChange = { motivation = it },
-            label = { Text("Що мене мотивуватиме?") },
+            label = { Text(stringResource(R.string.motivation_label)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -157,7 +159,7 @@ fun EditHabitContent(
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
         ) {
             Text(
-                text = "Нагадати мені",
+                text = stringResource(R.string.remind_me_label),
                 modifier = Modifier.weight(1f)
             )
             Switch(
@@ -178,11 +180,11 @@ fun EditHabitContent(
                     true
                 ).show()
             }) {
-                Text("Вибрати час: $pickedTime")
+                Text(stringResource(R.string.select_time, pickedTime))
             }
         }
 
-        Text(text = "Вибрати колір")
+        Text(text = stringResource(R.string.select_color))
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
@@ -204,43 +206,43 @@ fun EditHabitContent(
                 .clickable { deleteChecked = !deleteChecked },
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
         ) {
-            Text(
-                text = "Видалити звичку",
-                color = Red,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyMedium
-            )
             Checkbox(
                 checked = deleteChecked,
                 onCheckedChange = { deleteChecked = it },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = Red,
-                    checkmarkColor = Color.White,
-                    uncheckedColor = Red,
-                )
+                colors = CheckboxDefaults.colors(checkedColor = Red)
             )
+            Text(
+                text = stringResource(R.string.confirm_delete),
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (deleteChecked) Red else Color.Unspecified
+            )
+        }
+
+        Button(
+            onClick = {
+                if (deleteChecked) {
+                    onDeleteHabit(habit.id)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = deleteChecked,
+            colors = ButtonDefaults.buttonColors(containerColor = Red)
+        ) {
+            Text(stringResource(R.string.delete))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
-                if (deleteChecked) {
-                    onDeleteHabit(habit.id)
-                } else if (title.isNotBlank()) {
+                if (title.isNotBlank()) {
                     onSaveHabit(habit.id, title, selectedColor, selectedDays, reminderEnabled)
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Purple,
-                contentColor = Color.White
-            )
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Purple)
         ) {
-            Text(text = "Зберегти")
+            Text(stringResource(R.string.save))
         }
     }
 }

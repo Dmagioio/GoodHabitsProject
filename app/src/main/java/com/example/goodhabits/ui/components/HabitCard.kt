@@ -16,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.goodhabits.data.Habit
+import com.example.goodhabits.domain.model.Habit
 import androidx.compose.ui.graphics.toArgb
 
 @Composable

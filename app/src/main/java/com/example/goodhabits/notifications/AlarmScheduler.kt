@@ -7,14 +7,21 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import dagger.hilt.android.qualifiers.ApplicationContext
+import com.example.goodhabits.domain.repository.ReminderScheduler
+import javax.inject.Inject
+import javax.inject.Singleton
 import java.time.LocalTime
 import java.util.Calendar
 
-class AlarmScheduler(private val context: Context) {
+@Singleton
+class AlarmScheduler @Inject constructor(
+    @ApplicationContext private val context: Context
+) : ReminderScheduler {
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    fun schedule(habitId: Int, habitTitle: String, time: LocalTime) {
+    override fun schedule(habitId: Int, habitTitle: String, time: LocalTime) {
         val intent = Intent(context, ReminderReceiver::class.java).apply {
             putExtra("HABIT_TITLE", habitTitle)
             putExtra("HABIT_ID", habitId)
@@ -75,7 +82,7 @@ class AlarmScheduler(private val context: Context) {
         }
     }
 
-    fun cancel(habitId: Int) {
+    override fun cancel(habitId: Int) {
         val intent = Intent(context, ReminderReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             context,

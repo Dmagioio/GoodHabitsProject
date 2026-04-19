@@ -40,17 +40,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.example.goodhabits.data.Habit
+import androidx.compose.ui.res.stringResource
+import com.example.goodhabits.R
+import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.components.EmptyHabitsContent
 import com.example.goodhabits.ui.theme.GreyBlue
 import com.example.goodhabits.ui.theme.Purple
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-enum class TabScreen(val title: String) {
-    Daily("Щодня"),
-    Weekly("Щотижня"),
-    Overall("Загалом")
+enum class TabScreen(val titleRes: Int) {
+    Daily(R.string.daily_tab),
+    Weekly(R.string.weekly_tab),
+    Overall(R.string.overall_tab)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,7 +80,7 @@ fun MainScreen(
                         .padding(top = 40.dp, bottom = 16.dp)
                 ) {
                     Text(
-                        text = "Звички",
+                        text = stringResource(R.string.habits_title),
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
@@ -86,7 +88,7 @@ fun MainScreen(
                     androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(12.dp))
 
                     NavigationDrawerItem(
-                        label = { Text("Ідеї") },
+                        label = { Text(stringResource(R.string.ideas)) },
                         icon = { Icon(imageVector = Icons.Filled.Lightbulb, contentDescription = null) },
                         selected = false,
                         onClick = { scope.launch { drawerState.close() } },
@@ -100,7 +102,7 @@ fun MainScreen(
                     )
 
                     NavigationDrawerItem(
-                        label = { Text("Аналітика") },
+                        label = { Text(stringResource(R.string.analytics)) },
                         icon = { Icon(imageVector = Icons.Filled.ShowChart, contentDescription = null) },
                         selected = false,
                         onClick = { scope.launch { drawerState.close() } },
@@ -114,7 +116,7 @@ fun MainScreen(
                     )
 
                     NavigationDrawerItem(
-                        label = { Text("Налаштування") },
+                        label = { Text(stringResource(R.string.settings)) },
                         icon = { Icon(imageVector = Icons.Filled.Settings, contentDescription = null) },
                         selected = false,
                         onClick = { scope.launch { drawerState.close() } },
@@ -135,7 +137,7 @@ fun MainScreen(
             modifier = Modifier.fillMaxSize(),
             topBar = {
                 TopAppBar(
-                    title = { Text("Звички") },
+                    title = { Text(stringResource(R.string.habits_title)) },
                     navigationIcon = {
                         IconButton(onClick = {
                             scope.launch {
@@ -197,7 +199,7 @@ fun MainScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = screen.title,
+                                        text = stringResource(screen.titleRes),
                                         style = MaterialTheme.typography.labelLarge,
                                         modifier = Modifier.zIndex(1f)
                                     )

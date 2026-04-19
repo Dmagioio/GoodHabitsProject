@@ -1,3 +1,34 @@
 <resources>
     <string name="app_name">GoodHabits</string>
+    <string name="habits_title">Звички</string>
+    <string name="new_habit_title">Нова звичка</string>
+    <string name="edit_habit_title">Редагувати звичку</string>
+    <string name="back">Назад</string>
+    <string name="save">Зберегти</string>
+    <string name="delete">Видалити</string>
+    <string name="confirm_delete">Ви впевнені, що хочете видалити цю звичку?</string>
+    <string name="habit_name_label">Назва звички</string>
+    <string name="motivation_label">Що мене мотивуватиме?</string>
+    <string name="remind_me_label">Нагадати мені</string>
+    <string name="select_time">Вибрати час: %s</string>
+    <string name="select_color">Вибрати колір</string>
+    <string name="do_it_on">Я буду робити це в</string>
+    <string name="daily_tab">Щодня</string>
+    <string name="weekly_tab">Щотижня</string>
+    <string name="overall_tab">Загалом</string>
+    <string name="ideas">Ідеї</string>
+    <string name="analytics">Аналітика</string>
+    <string name="settings">Налаштування</string>
+    <string name="error_add_habit">Помилка при додаванні звички: %s</string>
+    <string name="error_update_habit">Помилка при оновленні звички: %s</string>
+    <string name="error_delete_habit">Помилка при видаленні звички: %s</string>
+    <string name="error_general">Помилка: %s</string>
+    <string name="notification_channel_name">Нагадування про звички</string>
+    <string name="notification_channel_desc">Канал для щоденних нагадувань про звички</string>
+    <string name="notification_content_title">Час для звички! 🔔</string>
+    <string name="notification_default_text">Час виконати звичку!</string>
+    <string name="empty_habits_msg">У вас ще немає звичок.</string>
+    <string name="create_new_habit_btn">Створити нову звичку</string>
+    <string name="or_text">або</string>
+    <string name="choose_from_ideas_btn">Вибрати з ідей</string>
 </resources>

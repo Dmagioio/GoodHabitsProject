@@ -1,107 +1,102 @@
 package com.example.goodhabits.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import com.example.goodhabits.data.Habit
-import com.example.goodhabits.data.HabitRepository
-import com.example.goodhabits.notifications.AlarmScheduler
-import com.example.goodhabits.ui.navigation.RootScreen
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.goodhabits.domain.model.Habit
+import com.example.goodhabits.domain.usecase.AddHabitUseCase
+import com.example.goodhabits.domain.usecase.DeleteHabitUseCase
+import com.example.goodhabits.domain.usecase.ObserveHabitsUseCase
+import com.example.goodhabits.domain.usecase.ToggleHabitForDateUseCase
+import com.example.goodhabits.domain.usecase.UpdateHabitUseCase
+import android.content.Context
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import kotlin.String
 
-data class HabitUiState(
-    val habits: List<Habit> = emptyList(),
-    val currentScreen: RootScreen = RootScreen.Main,
-    val habitToEdit: Habit? = null
-)
-class HabitViewModel(
-    private val repository: HabitRepository = HabitRepository()
+@HiltViewModel
+class HabitViewModel @Inject constructor(
+    @ApplicationContext context: Context,
+    observeHabitsUseCase: ObserveHabitsUseCase,
+    addHabitUseCase: AddHabitUseCase,
+    updateHabitUseCase: UpdateHabitUseCase,
+    deleteHabitUseCase: DeleteHabitUseCase,
+    toggleHabitForDateUseCase: ToggleHabitForDateUseCase
 ) : ViewModel() {
+    private val draftStateHolder = HabitDraftStateHolder()
+    private val screenStateHolder = HabitScreenStateHolder()
+    private val actionHandler = HabitActionHandler(
+        context = context,
+        addHabitUseCase = addHabitUseCase,
+        updateHabitUseCase = updateHabitUseCase,
+        deleteHabitUseCase = deleteHabitUseCase,
+        toggleHabitForDateUseCase = toggleHabitForDateUseCase,
+        draftStateHolder = draftStateHolder,
+        screenStateHolder = screenStateHolder
+    )
 
-    private val _uiState = MutableStateFlow(HabitUiState())
-    val uiState: StateFlow<HabitUiState> = _uiState
-
-    private val _reminderTime = MutableStateFlow(LocalTime.of(12, 0))
-    val reminderTime: StateFlow<LocalTime> = _reminderTime.asStateFlow()
+    val draftTitle: StateFlow<String> = draftStateHolder.draftTitle
+    val draftMotivation: StateFlow<String> = draftStateHolder.draftMotivation
+    val draftSelectedDays: StateFlow<Set<String>> = draftStateHolder.draftSelectedDays
+    val isReminderEnabled: StateFlow<Boolean> = draftStateHolder.isReminderEnabled
+    val draftSelectedColor: StateFlow<Color> = draftStateHolder.draftSelectedColor
+    val reminderTime: StateFlow<LocalTime> = draftStateHolder.reminderTime
+    val uiState: StateFlow<HabitUiState> = screenStateHolder.uiState
 
     init {
         viewModelScope.launch {
-            repository.habits.collect { list ->
-                _uiState.update { state -> state.copy(habits = list) }
+            observeHabitsUseCase().collect { list ->
+                screenStateHolder.updateHabits(list)
             }
         }
     }
 
-    fun openAddHabit() {
-        _uiState.update { it.copy(currentScreen = RootScreen.AddHabit) }
+    fun updateDraftTitle(title: String) = draftStateHolder.updateDraftTitle(title)
+    fun updateDraftMotivation(motivation: String) = draftStateHolder.updateDraftMotivation(motivation)
+    fun updateDraftDays(days: Set<String>) = draftStateHolder.updateDraftDays(days)
+    fun toggleReminder(isEnabled: Boolean) = draftStateHolder.toggleReminder(isEnabled)
+
+    fun updateDraftColor(color: Color) = draftStateHolder.updateDraftColor(color)
+    fun updateReminderTime(hour: Int, minute: Int) = draftStateHolder.updateReminderTime(hour, minute)
+
+    fun clearDraft() = draftStateHolder.clear()
+
+    fun addHabit() {
+        viewModelScope.launch {
+            actionHandler.addHabit()
+        }
     }
 
-    fun openEditHabit(habit: Habit) {
-        _uiState.update { it.copy(currentScreen = RootScreen.EditHabit, habitToEdit = habit) }
-    }
-
-    fun backToMain() {
-        _uiState.update { it.copy(currentScreen = RootScreen.Main, habitToEdit = null) }
-    }
-
-    fun addHabit(context: Context, title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean) {
-        val time = if (isReminderEnabled) _reminderTime.value else null
-        val newId = repository.addHabit(
-            title = title,
-            colorHex = color.toArgb().toLong(),
-            days = days,
-            reminderTime = time,
-        )
-
-        val scheduler = AlarmScheduler(context)
-        if (isReminderEnabled && time != null) {
-            scheduler.schedule(newId, title, time)
-        } else scheduler.cancel(newId)
-
-        backToMain()
-    }
-
-    fun updateHabit(context: Context, id: Int, title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean) {
-        val time = if (isReminderEnabled) _reminderTime.value else null
-        repository.updateHabit(
-            id = id,
-            title = title,
-            colorHex = color.toArgb().toLong(),
-            days = days,
-            reminderTime = time,
-        )
-
-        val scheduler = AlarmScheduler(context)
-        if (isReminderEnabled && time != null) {
-            scheduler.schedule(id, title, time)
-        } else scheduler.cancel(id)
-
-        backToMain()
-    }
-
-    fun updateReminderTime(hour: Int, minute: Int) {
-        _reminderTime.value = LocalTime.of(hour, minute)
+    fun updateHabit(id: Int, title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean) {
+        viewModelScope.launch {
+            actionHandler.updateHabit(id, title, color, days, isReminderEnabled)
+        }
     }
 
     fun deleteHabit(id: Int) {
-        repository.deleteHabit(id)
-        backToMain()
+        viewModelScope.launch {
+            actionHandler.deleteHabit(id)
+        }
     }
 
     fun toggleHabitToday(habitId: Int) {
-        repository.toggleHabitForDate(habitId, LocalDate.now())
+        viewModelScope.launch {
+            actionHandler.toggleHabitToday(habitId)
+        }
     }
 
     fun toggleHabitForDate(habitId: Int, date: LocalDate) {
-        repository.toggleHabitForDate(habitId, date)
+        viewModelScope.launch {
+            actionHandler.toggleHabitForDate(habitId, date)
+        }
+    }
+
+    fun clearError() {
+        screenStateHolder.setError(null)
     }
 }

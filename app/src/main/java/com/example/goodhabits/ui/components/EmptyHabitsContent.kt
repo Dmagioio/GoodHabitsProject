@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.goodhabits.R
 import com.example.goodhabits.ui.theme.LightBlue
 import com.example.goodhabits.ui.theme.Purple
 
@@ -33,7 +35,7 @@ fun EmptyHabitsContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "У вас ще немає звичок.",
+            text = stringResource(R.string.empty_habits_msg),
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
@@ -48,13 +50,13 @@ fun EmptyHabitsContent(
                 contentColor = Color.White
             )
         ) {
-            Text(text = "Створити нову звичку")
+            Text(text = stringResource(R.string.create_new_habit_btn))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "або",
+            text = stringResource(R.string.or_text),
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -68,7 +70,7 @@ fun EmptyHabitsContent(
                 contentColor = Color.White,
             )
         ) {
-            Text(text = "Вибрати з ідей")
+            Text(text = stringResource(R.string.choose_from_ideas_btn))
         }
     }
 }

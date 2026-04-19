@@ -3,30 +3,42 @@ package com.example.goodhabits.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.goodhabits.viewmodel.HabitUiState
 import com.example.goodhabits.viewmodel.HabitViewModel
-import com.example.goodhabits.data.Habit
+import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.screens.add.AddHabitScreen
 import com.example.goodhabits.ui.screens.edit.EditHabitScreen
 import com.example.goodhabits.ui.screens.main.MainScreen
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import java.time.LocalDate
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+
 @Composable
-fun HabitApp(viewModel: HabitViewModel = viewModel()) {
+fun HabitApp(viewModel: HabitViewModel = hiltViewModel()) {
+    val navController = rememberNavController()
     val state by viewModel.uiState.collectAsState()
 
-    val context = LocalContext.current
-
     HabitNavHost(
+        navController = navController,
         state = state,
         viewModel = viewModel,
-        onOpenAddHabit = { viewModel.openAddHabit() },
-        onOpenEditHabit = { habit -> viewModel.openEditHabit(habit) },
-        onBackToMain = { viewModel.backToMain() },
-        onAddHabit = {title, color, days, time -> viewModel.addHabit(context, title, color, days, time) },
-        onUpdateHabit = {id, title, color, days, time -> viewModel.updateHabit(context, id, title, color, days, time) },
+        onOpenAddHabit = { 
+            viewModel.clearDraft()
+            navController.navigate(Screen.AddHabit.route) 
+        },
+        onOpenEditHabit = { habit -> 
+            viewModel.clearDraft()
+            navController.navigate(Screen.EditHabit.createRoute(habit.id))
+        },
+        onBackToMain = { navController.popBackStack() },
+        onAddHabit = { viewModel.addHabit() },
+        onUpdateHabit = { id, title, color, days, time -> viewModel.updateHabit(id, title, color, days, time) },
         onDeleteHabit = { id -> viewModel.deleteHabit(id) },
         onToggleHabitToday = { habitId -> viewModel.toggleHabitToday(habitId) },
         onToggleHabitForDate = { habitId, date -> viewModel.toggleHabitForDate(habitId, date) }
@@ -35,46 +47,67 @@ fun HabitApp(viewModel: HabitViewModel = viewModel()) {
 
 @Composable
 fun HabitNavHost(
+    navController: NavHostController,
     state: HabitUiState,
     viewModel: HabitViewModel,
     onOpenAddHabit: () -> Unit,
     onOpenEditHabit: (Habit) -> Unit,
     onBackToMain: () -> Unit,
-    onAddHabit: (String, Color, Set<String>, Boolean) -> Unit,
+    onAddHabit: () -> Unit,
     onUpdateHabit: (Int, String, Color, Set<String>, Boolean) -> Unit,
     onDeleteHabit: (Int) -> Unit,
     onToggleHabitToday: (Int) -> Unit,
     onToggleHabitForDate: (Int, LocalDate) -> Unit
 ) {
-    when (state.currentScreen) {
-        RootScreen.Main -> MainScreen(
-            habits = state.habits,
-            onOpenAddHabit = onOpenAddHabit,
-            onToggleHabitToday = onToggleHabitToday,
-            onToggleHabitForDate = onToggleHabitForDate,
-            onHabitClick = onOpenEditHabit
-        )
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Main.route
+    ) {
+        composable(Screen.Main.route) {
+            MainScreen(
+                habits = state.habits,
+                onOpenAddHabit = onOpenAddHabit,
+                onToggleHabitToday = onToggleHabitToday,
+                onToggleHabitForDate = onToggleHabitForDate,
+                onHabitClick = onOpenEditHabit
+            )
+        }
 
-        RootScreen.AddHabit -> AddHabitScreen(
-            onBack = onBackToMain,
-            onSaveHabit = onAddHabit,
-            viewModel = viewModel,
-        )
+        composable(Screen.AddHabit.route) {
+            AddHabitScreen(
+                onBack = onBackToMain,
+                onSaveHabit = {
+                    onAddHabit()
+                    onBackToMain()
+                },
+                viewModel = viewModel,
+            )
+        }
 
-        RootScreen.EditHabit -> {
-            val habit = state.habitToEdit
+        composable(
+            route = Screen.EditHabit.route,
+            arguments = listOf(navArgument("habitId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val habitId = backStackEntry.arguments?.getInt("habitId") ?: -1
+            val habit = state.habits.find { it.id == habitId }
+
             if (habit == null) {
                 onBackToMain()
             } else {
                 EditHabitScreen(
                     habit = habit,
                     onBack = onBackToMain,
-                    onSaveHabit = onUpdateHabit,
-                    onDeleteHabit = onDeleteHabit,
+                    onSaveHabit = { id, title, color, days, time ->
+                        onUpdateHabit(id, title, color, days, time)
+                        onBackToMain()
+                    },
+                    onDeleteHabit = { id ->
+                        onDeleteHabit(id)
+                        onBackToMain()
+                    },
                     viewModel = viewModel,
                 )
             }
         }
     }
 }
-

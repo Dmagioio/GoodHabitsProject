@@ -33,34 +33,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.goodhabits.R
 import com.example.goodhabits.viewmodel.HabitViewModel
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
 import com.example.goodhabits.ui.theme.LightBlue
 import com.example.goodhabits.ui.theme.LightGrey
-import com.example.goodhabits.ui.theme.Orang
+import com.example.goodhabits.ui.theme.Orange
 import com.example.goodhabits.ui.theme.Pink
 import com.example.goodhabits.ui.theme.Purple
 import com.example.goodhabits.ui.theme.Red
 import com.example.goodhabits.ui.theme.Yellow
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddHabitScreen(
     onBack: () -> Unit,
-    onSaveHabit: (String, Color, Set<String>, Boolean) -> Unit,
-    viewModel: HabitViewModel
+    viewModel: HabitViewModel,
+    onSaveHabit: () -> Unit
 
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Нова звичка") },
+                title = { Text(stringResource(R.string.new_habit_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Назад"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 }
@@ -71,8 +74,8 @@ fun AddHabitScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
-            onSaveHabit = onSaveHabit,
-            viewModel = viewModel
+            viewModel = viewModel,
+            onSaveHabit = onSaveHabit
         )
     }
 }
@@ -80,42 +83,28 @@ fun AddHabitScreen(
 @Composable
 fun AddHabitContent(
     modifier: Modifier = Modifier,
-    onSaveHabit: (String, Color, Set<String>, Boolean) -> Unit,
-    viewModel: HabitViewModel
+    viewModel: HabitViewModel,
+    onSaveHabit: () -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
-    var motivation by remember { mutableStateOf("") }
-    var reminderEnabled by remember { mutableStateOf(false) }
-
+    val title by viewModel.draftTitle.collectAsState()
+    val motivation by viewModel.draftMotivation.collectAsState()
+    val reminderEnabled by viewModel.isReminderEnabled.collectAsState()
     val pickedTime by viewModel.reminderTime.collectAsState()
     val context = LocalContext.current
-
-//    val timePickerDialog = remember {
-//        TimePickerDialog(
-//            context,
-//            { _, hour, minute ->
-//                viewModel.updateReminderTime(hour, minute)
-//            },
-//            pickedTime.hour,
-//            pickedTime.minute,
-//            true
-//        )
-//    }
 
     val habitColors = listOf(
         Purple,
         Yellow,
         LightBlue,
         Pink,
-        Orang,
+        Orange,
         LightGrey,
         Red,
     )
-    var selectedColor by remember { mutableStateOf(habitColors.first()) }
+    val selectedColor by viewModel.draftSelectedColor.collectAsState()
 
     val habitDays = listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб")
-
-    var selectedDays by remember { mutableStateOf(setOf<String>()) }
+    val selectedDays by viewModel.draftSelectedDays.collectAsState()
 
     Column(
         modifier = modifier
@@ -125,12 +114,12 @@ fun AddHabitContent(
     ) {
         OutlinedTextField(
             value = title,
-            onValueChange = { title = it },
-            label = { Text("Назва звички") },
+            onValueChange = { viewModel.updateDraftTitle(it) },
+            label = { Text(stringResource(R.string.habit_name_label)) },
             modifier = Modifier.fillMaxWidth()
         )
 
-        Text(text = "Я буду робити це в")
+        Text(text = stringResource(R.string.do_it_on))
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
@@ -140,11 +129,8 @@ fun AddHabitContent(
                     text = day,
                     isSelected = selectedDays.contains(day),
                     onClick = {
-                        selectedDays = if (selectedDays.contains(day)) {
-                            selectedDays - day
-                        } else {
-                            selectedDays + day
-                        }
+                        val newDays = if (selectedDays.contains(day)) selectedDays - day else selectedDays + day
+                        viewModel.updateDraftDays(newDays)
                     }
                 )
             }
@@ -152,8 +138,8 @@ fun AddHabitContent(
 
         OutlinedTextField(
             value = motivation,
-            onValueChange = { motivation = it },
-            label = { Text("Що мене мотивуватиме?") },
+            onValueChange = { viewModel.updateDraftMotivation(it) },
+            label = { Text(stringResource(R.string.motivation_label)) },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -162,12 +148,12 @@ fun AddHabitContent(
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
         ) {
             Text(
-                text = "Нагадати мені",
+                text = stringResource(R.string.remind_me_label),
                 modifier = Modifier.weight(1f)
             )
             Switch(
                 checked = reminderEnabled,
-                onCheckedChange = { reminderEnabled = it }
+                onCheckedChange = { viewModel.toggleReminder(it) }
             )
         }
 
@@ -183,11 +169,11 @@ fun AddHabitContent(
                     true
                 ).show()
             }) {
-                Text("Вибрати час: $pickedTime")
+                Text(stringResource(R.string.select_time, pickedTime))
             }
         }
 
-        Text(text = "Вибрати колір")
+        Text(text = stringResource(R.string.select_color))
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
@@ -196,7 +182,7 @@ fun AddHabitContent(
                 ColorCircle(
                     color = color,
                     selected = color == selectedColor,
-                    onClick = { selectedColor = color }
+                    onClick = { viewModel.updateDraftColor(color) }
                 )
             }
         }
@@ -206,7 +192,7 @@ fun AddHabitContent(
         Button(
             onClick = {
                 if (title.isNotBlank()) {
-                    onSaveHabit(title, selectedColor, selectedDays, reminderEnabled)
+                    onSaveHabit()
                 }
             },
             modifier = Modifier
@@ -214,11 +200,10 @@ fun AddHabitContent(
                 .padding(vertical = 8.dp),
             shape = androidx.compose.foundation.shape.RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Purple,
-                contentColor = Color.White
+                containerColor = Purple
             )
         ) {
-            Text(text = "Зберегти")
+            Text(stringResource(R.string.save))
         }
     }
 }
