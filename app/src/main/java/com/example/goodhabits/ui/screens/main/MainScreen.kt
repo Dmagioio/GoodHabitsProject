@@ -60,6 +60,7 @@ enum class TabScreen(val titleRes: Int) {
 fun MainScreen(
     habits: List<Habit>,
     onOpenAddHabit: () -> Unit,
+    onOpenAnalytics: () -> Unit,
     onToggleHabitToday: (Int) -> Unit,
     onToggleHabitForDate: (Int, LocalDate) -> Unit,
     onHabitClick: (Habit) -> Unit
@@ -105,7 +106,12 @@ fun MainScreen(
                         label = { Text(stringResource(R.string.analytics)) },
                         icon = { Icon(imageVector = Icons.Filled.ShowChart, contentDescription = null) },
                         selected = false,
-                        onClick = { scope.launch { drawerState.close() } },
+                        onClick = { 
+                            scope.launch { 
+                                drawerState.close() 
+                                onOpenAnalytics()
+                            } 
+                        },
                         modifier = Modifier.padding(horizontal = 8.dp),
                         colors = NavigationDrawerItemDefaults.colors(
                             selectedContainerColor = Color.White,

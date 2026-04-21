@@ -10,6 +10,7 @@ import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.screens.add.AddHabitScreen
 import com.example.goodhabits.ui.screens.edit.EditHabitScreen
 import com.example.goodhabits.ui.screens.main.MainScreen
+import com.example.goodhabits.ui.screens.analytics.AnalyticsScreen
 import androidx.compose.ui.graphics.Color
 import java.time.LocalDate
 import androidx.navigation.NavHostController
@@ -36,6 +37,7 @@ fun HabitApp(viewModel: HabitViewModel = hiltViewModel()) {
             viewModel.clearDraft()
             navController.navigate(Screen.EditHabit.createRoute(habit.id))
         },
+        onOpenAnalytics = { navController.navigate(Screen.Analytics.route) },
         onBackToMain = { navController.popBackStack() },
         onAddHabit = { viewModel.addHabit() },
         onUpdateHabit = { id, title, color, days, time -> viewModel.updateHabit(id, title, color, days, time) },
@@ -51,6 +53,7 @@ fun HabitNavHost(
     state: HabitUiState,
     viewModel: HabitViewModel,
     onOpenAddHabit: () -> Unit,
+    onOpenAnalytics: () -> Unit,
     onOpenEditHabit: (Habit) -> Unit,
     onBackToMain: () -> Unit,
     onAddHabit: () -> Unit,
@@ -67,9 +70,16 @@ fun HabitNavHost(
             MainScreen(
                 habits = state.habits,
                 onOpenAddHabit = onOpenAddHabit,
+                onOpenAnalytics = onOpenAnalytics,
                 onToggleHabitToday = onToggleHabitToday,
                 onToggleHabitForDate = onToggleHabitForDate,
                 onHabitClick = onOpenEditHabit
+            )
+        }
+
+        composable(Screen.Analytics.route) {
+            AnalyticsScreen(
+                onBack = onBackToMain
             )
         }
 
