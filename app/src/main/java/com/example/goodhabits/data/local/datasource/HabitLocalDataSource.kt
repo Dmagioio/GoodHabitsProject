@@ -14,7 +14,9 @@ class HabitLocalDataSource @Inject constructor(
 
     suspend fun getHabitById(id: Int): HabitEntity? = habitDao.getHabitById(id)
 
-    suspend fun insertHabit(habit: HabitEntity): Int = habitDao.insertHabit(habit).toInt()
+    suspend fun deleteAll() = habitDao.deleteAll()
+
+    suspend fun insertHabit(habit: HabitEntity) = habitDao.insertHabit(habit).toInt()
 
     suspend fun updateHabit(habit: HabitEntity) = habitDao.updateHabit(habit)
 

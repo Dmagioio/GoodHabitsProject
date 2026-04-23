@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
@@ -27,10 +26,13 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -46,6 +48,7 @@ import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.components.EmptyHabitsContent
 import com.example.goodhabits.ui.theme.GreyBlue
 import com.example.goodhabits.ui.theme.Purple
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -61,13 +64,23 @@ fun MainScreen(
     habits: List<Habit>,
     onOpenAddHabit: () -> Unit,
     onOpenAnalytics: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenIdeas: () -> Unit,
     onToggleHabitToday: (Int) -> Unit,
     onToggleHabitForDate: (Int, LocalDate) -> Unit,
     onHabitClick: (Habit) -> Unit
 ) {
-    val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
+
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+    var gesturesEnabled by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        drawerState.snapTo(DrawerValue.Closed)
+        delay(500)
+        gesturesEnabled = true
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -92,7 +105,12 @@ fun MainScreen(
                         label = { Text(stringResource(R.string.ideas)) },
                         icon = { Icon(imageVector = Icons.Filled.Lightbulb, contentDescription = null) },
                         selected = false,
-                        onClick = { scope.launch { drawerState.close() } },
+                        onClick = { 
+                            scope.launch { 
+                                drawerState.snapTo(androidx.compose.material3.DrawerValue.Closed)
+                                onOpenIdeas()
+                            } 
+                        },
                         modifier = Modifier.padding(horizontal = 8.dp),
                         colors = NavigationDrawerItemDefaults.colors(
                             selectedContainerColor = Color.White,
@@ -108,7 +126,7 @@ fun MainScreen(
                         selected = false,
                         onClick = { 
                             scope.launch { 
-                                drawerState.close() 
+                                drawerState.snapTo(androidx.compose.material3.DrawerValue.Closed)
                                 onOpenAnalytics()
                             } 
                         },
@@ -125,7 +143,12 @@ fun MainScreen(
                         label = { Text(stringResource(R.string.settings)) },
                         icon = { Icon(imageVector = Icons.Filled.Settings, contentDescription = null) },
                         selected = false,
-                        onClick = { scope.launch { drawerState.close() } },
+                        onClick = { 
+                            scope.launch { 
+                                drawerState.snapTo(androidx.compose.material3.DrawerValue.Closed)
+                                onOpenSettings()
+                            } 
+                        },
                         modifier = Modifier.padding(horizontal = 8.dp),
                         colors = NavigationDrawerItemDefaults.colors(
                             selectedContainerColor = Color.White,
@@ -137,7 +160,7 @@ fun MainScreen(
                 }
             }
         },
-        gesturesEnabled = true
+        gesturesEnabled = gesturesEnabled
     ) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -145,11 +168,16 @@ fun MainScreen(
                 TopAppBar(
                     title = { Text(stringResource(R.string.habits_title)) },
                     navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                            }
-                        }) {
+                        IconButton(
+                            onClick = {
+                                if (gesturesEnabled) {
+                                    scope.launch {
+                                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                                    }
+                                }
+                            },
+                            enabled = gesturesEnabled
+                        ) {
                             Icon(Icons.Filled.Menu, contentDescription = "Menu")
                         }
                     },
@@ -174,7 +202,7 @@ fun MainScreen(
                 if (habits.isEmpty()) {
                     EmptyHabitsContent(
                         onCreateClick = onOpenAddHabit,
-                        onIdeasClick = { /* TODO */ }
+                        onIdeasClick = onOpenIdeas
                     )
                 } else {
                     TabRow(

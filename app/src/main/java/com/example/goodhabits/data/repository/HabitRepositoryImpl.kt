@@ -44,4 +44,8 @@ class HabitRepositoryImpl @Inject constructor(
 
         localDataSource.updateHabit(habit.copy(completedDates = updatedDates))
     }
+
+    override suspend fun deleteAllHabits() {
+        localDataSource.deleteAll()
+    }
 }

@@ -62,7 +62,6 @@ fun AnalyticsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // Habit Filter Chips
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -100,7 +99,6 @@ fun AnalyticsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Completed Habits Section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -138,7 +136,6 @@ fun AnalyticsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Stats Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
@@ -169,7 +166,6 @@ fun AnalyticsScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Heatmap Section
             Text(
                 text = stringResource(R.string.habit_heatmap_title),
                 style = MaterialTheme.typography.titleLarge,
@@ -178,7 +174,6 @@ fun AnalyticsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Heatmap Card (Calendar)
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
@@ -186,7 +181,6 @@ fun AnalyticsScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    // Month Selector
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -206,7 +200,6 @@ fun AnalyticsScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Days of week header
                     Row(modifier = Modifier.fillMaxWidth()) {
                         val daysOfWeek = listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб")
                         daysOfWeek.forEach { day ->
@@ -222,7 +215,6 @@ fun AnalyticsScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Calendar Grid
                     val firstDayOfMonth = uiState.currentMonth.atDay(1)
                     val daysInMonth = uiState.currentMonth.lengthOfMonth()
                     val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7 // 0 for Sunday

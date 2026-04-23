@@ -2,17 +2,14 @@ package com.example.goodhabits.viewmodel
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.example.goodhabits.R
 import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.domain.usecase.AddHabitUseCase
 import com.example.goodhabits.domain.usecase.DeleteHabitUseCase
 import com.example.goodhabits.domain.usecase.ToggleHabitForDateUseCase
 import com.example.goodhabits.domain.usecase.UpdateHabitUseCase
 import java.time.LocalDate
-import android.content.Context
 
 internal class HabitActionHandler(
-    private val context: Context,
     private val addHabitUseCase: AddHabitUseCase,
     private val updateHabitUseCase: UpdateHabitUseCase,
     private val deleteHabitUseCase: DeleteHabitUseCase,
@@ -35,7 +32,7 @@ internal class HabitActionHandler(
 
             draftStateHolder.clear()
         } catch (e: Exception) {
-            screenStateHolder.setError(context.getString(R.string.error_add_habit, e.localizedMessage))
+            screenStateHolder.setError("Помилка додавання звички: ${e.localizedMessage}")
         }
     }
 
@@ -60,7 +57,7 @@ internal class HabitActionHandler(
 
             draftStateHolder.clear()
         } catch (e: Exception) {
-            screenStateHolder.setError(context.getString(R.string.error_update_habit, e.localizedMessage))
+            screenStateHolder.setError("Помилка оновлення звички: ${e.localizedMessage}")
         }
     }
 
@@ -70,7 +67,7 @@ internal class HabitActionHandler(
             deleteHabitUseCase(id)
             draftStateHolder.clear()
         } catch (e: Exception) {
-            screenStateHolder.setError(context.getString(R.string.error_delete_habit, e.localizedMessage))
+            screenStateHolder.setError("Помилка видалення звички: ${e.localizedMessage}")
         }
     }
 
@@ -78,7 +75,7 @@ internal class HabitActionHandler(
         try {
             toggleHabitForDateUseCase(habitId, LocalDate.now())
         } catch (e: Exception) {
-            screenStateHolder.setError(context.getString(R.string.error_general, e.localizedMessage))
+            screenStateHolder.setError("Сталася помилка: ${e.localizedMessage}")
         }
     }
 
@@ -86,7 +83,7 @@ internal class HabitActionHandler(
         try {
             toggleHabitForDateUseCase(habitId, date)
         } catch (e: Exception) {
-            screenStateHolder.setError(context.getString(R.string.error_general, e.localizedMessage))
+            screenStateHolder.setError("Сталася помилка: ${e.localizedMessage}")
         }
     }
 }

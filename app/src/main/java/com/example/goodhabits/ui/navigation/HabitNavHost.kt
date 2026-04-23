@@ -11,6 +11,9 @@ import com.example.goodhabits.ui.screens.add.AddHabitScreen
 import com.example.goodhabits.ui.screens.edit.EditHabitScreen
 import com.example.goodhabits.ui.screens.main.MainScreen
 import com.example.goodhabits.ui.screens.analytics.AnalyticsScreen
+import com.example.goodhabits.ui.screens.settings.SettingsScreen
+import com.example.goodhabits.ui.screens.ideas.IdeasScreen
+import com.example.goodhabits.ui.screens.ideas.IdeaCategoryDetailScreen
 import androidx.compose.ui.graphics.Color
 import java.time.LocalDate
 import androidx.navigation.NavHostController
@@ -38,6 +41,8 @@ fun HabitApp(viewModel: HabitViewModel = hiltViewModel()) {
             navController.navigate(Screen.EditHabit.createRoute(habit.id))
         },
         onOpenAnalytics = { navController.navigate(Screen.Analytics.route) },
+        onOpenSettings = { navController.navigate(Screen.Settings.route) },
+        onOpenIdeas = { navController.navigate(Screen.Ideas.route) },
         onBackToMain = { navController.popBackStack() },
         onAddHabit = { viewModel.addHabit() },
         onUpdateHabit = { id, title, color, days, time -> viewModel.updateHabit(id, title, color, days, time) },
@@ -54,6 +59,8 @@ fun HabitNavHost(
     viewModel: HabitViewModel,
     onOpenAddHabit: () -> Unit,
     onOpenAnalytics: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenIdeas: () -> Unit,
     onOpenEditHabit: (Habit) -> Unit,
     onBackToMain: () -> Unit,
     onAddHabit: () -> Unit,
@@ -71,6 +78,8 @@ fun HabitNavHost(
                 habits = state.habits,
                 onOpenAddHabit = onOpenAddHabit,
                 onOpenAnalytics = onOpenAnalytics,
+                onOpenSettings = onOpenSettings,
+                onOpenIdeas = onOpenIdeas,
                 onToggleHabitToday = onToggleHabitToday,
                 onToggleHabitForDate = onToggleHabitForDate,
                 onHabitClick = onOpenEditHabit
@@ -83,7 +92,54 @@ fun HabitNavHost(
             )
         }
 
-        composable(Screen.AddHabit.route) {
+        composable(Screen.Settings.route) {
+            SettingsScreen(
+                onBack = onBackToMain
+            )
+        }
+
+        composable(Screen.Ideas.route) {
+            IdeasScreen(
+                onBack = onBackToMain,
+                onCategoryClick = { categoryId ->
+                    navController.navigate(Screen.IdeaCategoryDetail.createRoute(categoryId))
+                },
+                onCreateOwnClick = {
+                    onOpenAddHabit()
+                }
+            )
+        }
+
+        composable(
+            route = Screen.IdeaCategoryDetail.route,
+            arguments = listOf(navArgument("categoryId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
+            IdeaCategoryDetailScreen(
+                categoryId = categoryId,
+                onBack = { navController.popBackStack() },
+                onIdeaClick = { ideaTitle ->
+                    navController.navigate(Screen.AddHabit.createRoute(ideaTitle))
+                }
+            )
+        }
+
+        composable(
+            route = Screen.AddHabit.route,
+            arguments = listOf(
+                navArgument("title") { 
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+                navArgument("categoryId") { 
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) { backStackEntry ->
+            val preFilledTitle = backStackEntry.arguments?.getString("title")
             AddHabitScreen(
                 onBack = onBackToMain,
                 onSaveHabit = {
@@ -91,6 +147,7 @@ fun HabitNavHost(
                     onBackToMain()
                 },
                 viewModel = viewModel,
+                preFilledTitle = preFilledTitle
             )
         }
 

@@ -1,6 +1,5 @@
 package com.example.goodhabits.ui.screens.add
 
-import android.app.TimePickerDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,6 +23,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +38,7 @@ import com.example.goodhabits.R
 import com.example.goodhabits.viewmodel.HabitViewModel
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
+import com.example.goodhabits.ui.components.HabitTimePicker
 import com.example.goodhabits.ui.theme.LightBlue
 import com.example.goodhabits.ui.theme.LightGrey
 import com.example.goodhabits.ui.theme.Orange
@@ -52,9 +53,15 @@ import kotlinx.coroutines.flow.first
 fun AddHabitScreen(
     onBack: () -> Unit,
     viewModel: HabitViewModel,
-    onSaveHabit: () -> Unit
-
+    onSaveHabit: () -> Unit,
+    preFilledTitle: String? = null
 ) {
+    LaunchedEffect(Unit) {
+        if (preFilledTitle != null && !preFilledTitle.contains("{title}")) {
+            viewModel.updateDraftTitle(preFilledTitle)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -62,7 +69,7 @@ fun AddHabitScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back)
                         )
                     }
@@ -90,6 +97,7 @@ fun AddHabitContent(
     val motivation by viewModel.draftMotivation.collectAsState()
     val reminderEnabled by viewModel.isReminderEnabled.collectAsState()
     val pickedTime by viewModel.reminderTime.collectAsState()
+    var showTimePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     val habitColors = listOf(
@@ -158,19 +166,20 @@ fun AddHabitContent(
         }
 
         if (reminderEnabled) {
-            Button(onClick = {
-                TimePickerDialog(
-                    context,
-                    { _, hour, minute ->
-                        viewModel.updateReminderTime(hour, minute)
-                    },
-                    pickedTime.hour,
-                    pickedTime.minute,
-                    true
-                ).show()
-            }) {
+            Button(onClick = { showTimePicker = true }) {
                 Text(stringResource(R.string.select_time, pickedTime))
             }
+        }
+
+        if (showTimePicker) {
+            HabitTimePicker(
+                initialTime = pickedTime,
+                onTimeSelected = { time ->
+                    viewModel.updateReminderTime(time.hour, time.minute)
+                    showTimePicker = false
+                },
+                onDismiss = { showTimePicker = false }
+            )
         }
 
         Text(text = stringResource(R.string.select_color))

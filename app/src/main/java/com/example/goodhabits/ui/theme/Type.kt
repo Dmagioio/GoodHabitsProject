@@ -15,7 +15,6 @@ private val ProItalicFontFamily = FontFamily(
 val baseline = Typography()
 
 val Typography = Typography(
-    // ProBlack
     displayLarge = baseline.displayLarge.copy(fontFamily = ProBlackFontFamily),
     displayMedium = baseline.displayMedium.copy(fontFamily = ProBlackFontFamily),
     displaySmall = baseline.displaySmall.copy(fontFamily = ProBlackFontFamily),
@@ -25,11 +24,9 @@ val Typography = Typography(
     titleLarge = baseline.titleLarge.copy(fontFamily = ProBlackFontFamily),
     titleMedium = baseline.titleMedium.copy(fontFamily = ProBlackFontFamily),
     titleSmall = baseline.titleSmall.copy(fontFamily = ProBlackFontFamily),
-    // ProItalic
     bodyLarge = baseline.bodyLarge.copy(fontFamily = ProItalicFontFamily),
     bodyMedium = baseline.bodyMedium.copy(fontFamily = ProItalicFontFamily),
     bodySmall = baseline.bodySmall.copy(fontFamily = ProItalicFontFamily),
-    // Вкладки
     labelLarge = baseline.labelLarge.copy(fontFamily = ProItalicFontFamily),
     labelMedium = baseline.labelMedium.copy(fontFamily = ProItalicFontFamily),
     labelSmall = baseline.labelSmall.copy(fontFamily = ProItalicFontFamily),

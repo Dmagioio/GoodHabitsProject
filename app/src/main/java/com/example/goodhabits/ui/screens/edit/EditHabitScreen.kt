@@ -1,6 +1,5 @@
 package com.example.goodhabits.ui.screens.edit
 
-import android.app.TimePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -43,6 +42,7 @@ import com.example.goodhabits.viewmodel.HabitViewModel
 import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
+import com.example.goodhabits.ui.components.HabitTimePicker
 import com.example.goodhabits.ui.theme.LightBlue
 import com.example.goodhabits.ui.theme.LightGrey
 import com.example.goodhabits.ui.theme.Orange
@@ -67,7 +67,7 @@ fun EditHabitScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back)
                         )
                     }
@@ -99,6 +99,7 @@ fun EditHabitContent(
     var motivation by remember { mutableStateOf("") }
     var reminderEnabled by remember { mutableStateOf(false) }
     var deleteChecked by remember(habit.id) { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
 
     val pickedTime by viewModel.reminderTime.collectAsState()
     val context = LocalContext.current
@@ -169,19 +170,20 @@ fun EditHabitContent(
         }
 
         if (reminderEnabled) {
-            Button(onClick = {
-                TimePickerDialog(
-                    context,
-                    { _, hour, minute ->
-                        viewModel.updateReminderTime(hour, minute)
-                    },
-                    pickedTime.hour,
-                    pickedTime.minute,
-                    true
-                ).show()
-            }) {
+            Button(onClick = { showTimePicker = true }) {
                 Text(stringResource(R.string.select_time, pickedTime))
             }
+        }
+
+        if (showTimePicker) {
+            HabitTimePicker(
+                initialTime = pickedTime,
+                onTimeSelected = { time ->
+                    viewModel.updateReminderTime(time.hour, time.minute)
+                    showTimePicker = false
+                },
+                onDismiss = { showTimePicker = false }
+            )
         }
 
         Text(text = stringResource(R.string.select_color))

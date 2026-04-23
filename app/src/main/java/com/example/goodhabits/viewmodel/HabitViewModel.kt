@@ -9,9 +9,7 @@ import com.example.goodhabits.domain.usecase.DeleteHabitUseCase
 import com.example.goodhabits.domain.usecase.ObserveHabitsUseCase
 import com.example.goodhabits.domain.usecase.ToggleHabitForDateUseCase
 import com.example.goodhabits.domain.usecase.UpdateHabitUseCase
-import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -21,7 +19,6 @@ import kotlin.String
 
 @HiltViewModel
 class HabitViewModel @Inject constructor(
-    @ApplicationContext context: Context,
     observeHabitsUseCase: ObserveHabitsUseCase,
     addHabitUseCase: AddHabitUseCase,
     updateHabitUseCase: UpdateHabitUseCase,
@@ -31,7 +28,6 @@ class HabitViewModel @Inject constructor(
     private val draftStateHolder = HabitDraftStateHolder()
     private val screenStateHolder = HabitScreenStateHolder()
     private val actionHandler = HabitActionHandler(
-        context = context,
         addHabitUseCase = addHabitUseCase,
         updateHabitUseCase = updateHabitUseCase,
         deleteHabitUseCase = deleteHabitUseCase,

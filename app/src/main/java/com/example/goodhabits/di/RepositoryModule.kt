@@ -1,8 +1,10 @@
 package com.example.goodhabits.di
 
 import com.example.goodhabits.data.repository.HabitRepositoryImpl
+import com.example.goodhabits.data.repository.SettingsRepositoryImpl
 import com.example.goodhabits.domain.repository.HabitRepository
 import com.example.goodhabits.domain.repository.ReminderScheduler
+import com.example.goodhabits.domain.repository.SettingsRepository
 import com.example.goodhabits.notifications.AlarmScheduler
 import dagger.Binds
 import dagger.Module
@@ -24,4 +26,10 @@ abstract class RepositoryModule {
     abstract fun bindReminderScheduler(
         alarmScheduler: AlarmScheduler
     ): ReminderScheduler
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+        settingsRepositoryImpl: SettingsRepositoryImpl
+    ): SettingsRepository
 }
