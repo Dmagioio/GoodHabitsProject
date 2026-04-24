@@ -25,6 +25,8 @@ class AlarmScheduler @Inject constructor(
         val intent = Intent(context, ReminderReceiver::class.java).apply {
             putExtra("HABIT_TITLE", habitTitle)
             putExtra("HABIT_ID", habitId)
+            putExtra("SCHEDULED_HOUR", time.hour)
+            putExtra("SCHEDULED_MINUTE", time.minute)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -45,20 +47,18 @@ class AlarmScheduler @Inject constructor(
         }
 
         fun setTheAlarm() {
-            val intent = Intent(context, ReminderReceiver::class.java).apply {
-                putExtra("HABIT_TITLE", habitTitle)
-                putExtra("HABIT_ID", habitId)
+            try {
+                val alarmInfo = AlarmManager.AlarmClockInfo(calendar.timeInMillis, pendingIntent)
+                alarmManager.setAlarmClock(alarmInfo, pendingIntent)
+                Log.d("ALARM_DEBUG", "Будильник встановлено через setAlarmClock на ${calendar.time}")
+            } catch (e: SecurityException) {
+                Log.e("ALARM_ERROR", "Не вдалося встановити точний будильник: ${e.message}")
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.timeInMillis,
+                    pendingIntent
+                )
             }
-
-            val pendingIntent = PendingIntent.getBroadcast(
-                context, habitId, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-            val alarmInfo = AlarmManager.AlarmClockInfo(calendar.timeInMillis, pendingIntent)
-            alarmManager.setAlarmClock(alarmInfo, pendingIntent)
-
-            Log.d("ALARM_DEBUG", "Будильник встановлено через setAlarmClock на ${calendar.time}")
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

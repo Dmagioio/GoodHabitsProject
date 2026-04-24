@@ -61,4 +61,7 @@
     <string name="language_label">Language</string>
     <string name="language_uk">Ukrainian</string>
     <string name="language_en">English</string>
+    <string name="streak_days">%d days</string>
+    <string name="streak_label">Your current streak</string>
+    <string name="streak_start_msg">Start a new streak by completing habits</string>
 </resources>

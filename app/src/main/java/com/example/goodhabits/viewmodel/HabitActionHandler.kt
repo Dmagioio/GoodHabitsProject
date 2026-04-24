@@ -33,6 +33,8 @@ internal class HabitActionHandler(
             draftStateHolder.clear()
         } catch (e: Exception) {
             screenStateHolder.setError("Помилка додавання звички: ${e.localizedMessage}")
+        } finally {
+            screenStateHolder.setLoading(false)
         }
     }
 
@@ -58,6 +60,8 @@ internal class HabitActionHandler(
             draftStateHolder.clear()
         } catch (e: Exception) {
             screenStateHolder.setError("Помилка оновлення звички: ${e.localizedMessage}")
+        } finally {
+            screenStateHolder.setLoading(false)
         }
     }
 
@@ -68,6 +72,8 @@ internal class HabitActionHandler(
             draftStateHolder.clear()
         } catch (e: Exception) {
             screenStateHolder.setError("Помилка видалення звички: ${e.localizedMessage}")
+        } finally {
+            screenStateHolder.setLoading(false)
         }
     }
 

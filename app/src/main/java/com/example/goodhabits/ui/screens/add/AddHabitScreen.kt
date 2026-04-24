@@ -39,14 +39,9 @@ import com.example.goodhabits.viewmodel.HabitViewModel
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
 import com.example.goodhabits.ui.components.HabitTimePicker
-import com.example.goodhabits.ui.theme.LightBlue
-import com.example.goodhabits.ui.theme.LightGrey
-import com.example.goodhabits.ui.theme.Orange
-import com.example.goodhabits.ui.theme.Pink
-import com.example.goodhabits.ui.theme.Purple
-import com.example.goodhabits.ui.theme.Red
-import com.example.goodhabits.ui.theme.Yellow
-import kotlinx.coroutines.flow.first
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Brush
+import com.example.goodhabits.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -206,13 +201,20 @@ fun AddHabitContent(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 8.dp)
+                .height(56.dp)
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(AccentGradientStart, AccentGradientEnd)
+                    ),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(50)
+                ),
             shape = androidx.compose.foundation.shape.RoundedCornerShape(50),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Purple
+                containerColor = Color.Transparent
             )
         ) {
-            Text(stringResource(R.string.save))
+            Text(stringResource(R.string.save), color = Color.White)
         }
     }
 }

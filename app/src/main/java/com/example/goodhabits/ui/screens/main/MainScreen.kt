@@ -13,6 +13,8 @@ import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,17 +53,80 @@ import com.example.goodhabits.ui.theme.Purple
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 enum class TabScreen(val titleRes: Int) {
     Daily(R.string.daily_tab),
     Weekly(R.string.weekly_tab),
     Overall(R.string.overall_tab)
 }
 
+@Composable
+fun StreakCard(streak: Int) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .height(160.dp),
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.streak_bg),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = if (streak > 0) 
+                        stringResource(R.string.streak_label) 
+                    else 
+                        stringResource(R.string.streak_start_msg),
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 22.sp
+                    ),
+                    modifier = Modifier.fillMaxWidth(0.7f)
+                )
+                
+                Column {
+                    Text(
+                        text = stringResource(R.string.streak_days, streak),
+                        color = Color.White,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 36.sp
+                        )
+                    )
+                    Text(
+                        text = stringResource(R.string.streak_label),
+                        color = Color.White.copy(alpha = 0.8f),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     habits: List<Habit>,
+    currentStreak: Int = 0,
     onOpenAddHabit: () -> Unit,
     onOpenAnalytics: () -> Unit,
     onOpenSettings: () -> Unit,
@@ -86,7 +151,7 @@ fun MainScreen(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
-                drawerContainerColor = Color(0xFFF7F5FF)
+                drawerContainerColor = MaterialTheme.colorScheme.surface
             ) {
                 Column(
                     modifier = Modifier
@@ -96,10 +161,15 @@ fun MainScreen(
                     Text(
                         text = stringResource(R.string.habits_title),
                         style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
 
-                    androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    StreakCard(streak = currentStreak)
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     NavigationDrawerItem(
                         label = { Text(stringResource(R.string.ideas)) },
@@ -113,10 +183,12 @@ fun MainScreen(
                         },
                         modifier = Modifier.padding(horizontal = 8.dp),
                         colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = Color.White,
+                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                             unselectedContainerColor = Color.Transparent,
-                            selectedTextColor = Purple,
-                            selectedIconColor = Purple
+                            selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
 
@@ -132,10 +204,12 @@ fun MainScreen(
                         },
                         modifier = Modifier.padding(horizontal = 8.dp),
                         colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = Color.White,
+                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                             unselectedContainerColor = Color.Transparent,
-                            selectedTextColor = Purple,
-                            selectedIconColor = Purple
+                            selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
 
@@ -151,10 +225,12 @@ fun MainScreen(
                         },
                         modifier = Modifier.padding(horizontal = 8.dp),
                         colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = Color.White,
+                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                             unselectedContainerColor = Color.Transparent,
-                            selectedTextColor = Purple,
-                            selectedIconColor = Purple
+                            selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }

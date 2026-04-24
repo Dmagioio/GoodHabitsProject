@@ -5,9 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
             val language by settingsViewModel.language.collectAsState()
 
             val context = LocalContext.current
-            remember(language) {
+            LaunchedEffect(language) {
                 val locale = if (language == AppLanguage.EN) {
                     Locale.forLanguageTag("en")
                 } else {
@@ -46,7 +46,6 @@ class MainActivity : ComponentActivity() {
                 val config = context.resources.configuration
                 config.setLocale(locale)
                 context.resources.updateConfiguration(config, context.resources.displayMetrics)
-                true
             }
 
             GoodHabitsTheme(appTheme = theme) {

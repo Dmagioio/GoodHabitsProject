@@ -9,12 +9,14 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.goodhabits.MainActivity
 import com.example.goodhabits.R
+import com.example.goodhabits.domain.repository.ReminderScheduler
 import com.example.goodhabits.domain.repository.SettingsRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.LocalTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -23,11 +25,26 @@ class ReminderReceiver : BroadcastReceiver() {
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
+    @Inject
+    lateinit var reminderScheduler: ReminderScheduler
+
     override fun onReceive(context: Context, intent: Intent) {
         val habitTitle = intent.getStringExtra("HABIT_TITLE") ?: context.getString(R.string.notification_default_text)
+        val habitId = intent.getIntExtra("HABIT_ID", -1)
         Log.d("ALARM_RECEIVER", "СИГНАЛ Є! $habitTitle")
 
         CoroutineScope(Dispatchers.Main).launch {
+            // Реплануємо будильник на завтра
+            if (habitId != -1) {
+                val now = LocalTime.now()
+                // Використовуємо той самий час, що був встановлений
+                // Для простоти візьмемо поточну годину/хвилину, але в реалі 
+                // краще було б передавати початковий час через intent
+                val scheduledHour = intent.getIntExtra("SCHEDULED_HOUR", now.hour)
+                val scheduledMinute = intent.getIntExtra("SCHEDULED_MINUTE", now.minute)
+                reminderScheduler.schedule(habitId, habitTitle, LocalTime.of(scheduledHour, scheduledMinute))
+            }
+
             val notificationsEnabled = settingsRepository.globalNotificationsEnabled.first()
             if (!notificationsEnabled) {
                 Log.d("ALARM_RECEIVER", "Сповіщення вимкнені глобально (DND).")

@@ -61,4 +61,7 @@
     <string name="language_label">Мова</string>
     <string name="language_uk">Українська</string>
     <string name="language_en">Англійська</string>
+    <string name="streak_days">%d днів</string>
+    <string name="streak_label">Твій поточний стрік</string>
+    <string name="streak_start_msg">Почни новий стрік, виконуючи звички</string>
 </resources>

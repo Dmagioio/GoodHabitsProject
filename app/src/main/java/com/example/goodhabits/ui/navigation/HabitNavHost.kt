@@ -76,6 +76,7 @@ fun HabitNavHost(
         composable(Screen.Main.route) {
             MainScreen(
                 habits = state.habits,
+                currentStreak = state.currentStreak,
                 onOpenAddHabit = onOpenAddHabit,
                 onOpenAnalytics = onOpenAnalytics,
                 onOpenSettings = onOpenSettings,

@@ -43,13 +43,9 @@ import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
 import com.example.goodhabits.ui.components.HabitTimePicker
-import com.example.goodhabits.ui.theme.LightBlue
-import com.example.goodhabits.ui.theme.LightGrey
-import com.example.goodhabits.ui.theme.Orange
-import com.example.goodhabits.ui.theme.Pink
-import com.example.goodhabits.ui.theme.Purple
-import com.example.goodhabits.ui.theme.Red
-import com.example.goodhabits.ui.theme.Yellow
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Brush
+import com.example.goodhabits.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -241,10 +237,18 @@ fun EditHabitContent(
                     onSaveHabit(habit.id, title, selectedColor, selectedDays, reminderEnabled)
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Purple)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(AccentGradientStart, AccentGradientEnd)
+                    ),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(50)
+                ),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
         ) {
-            Text(stringResource(R.string.save))
+            Text(stringResource(R.string.save), color = Color.White)
         }
     }
 }
