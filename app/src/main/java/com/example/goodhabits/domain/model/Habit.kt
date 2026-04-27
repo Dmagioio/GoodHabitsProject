@@ -9,4 +9,5 @@ data class Habit(
     val completedDates: Set<Long> = emptySet(),
     val days: Set<String> = emptySet(),
     val reminderTime: LocalTime? = null,
+    val motivation: String = ""
 )

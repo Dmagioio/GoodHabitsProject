@@ -1,32 +1,32 @@
 package com.example.goodhabits.ui.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.goodhabits.domain.analysis.TimeAdaptationSuggestion
 import com.example.goodhabits.domain.model.Habit
-import androidx.compose.ui.graphics.toArgb
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HabitCard(
     habit: Habit,
     isCompletedToday: Boolean,
+    timeSuggestion: TimeAdaptationSuggestion? = null,
     onToggleHabit: () -> Unit,
     onClick: () -> Unit
 ) {
     val cardColor = Color(habit.colorHex.toInt())
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     Card(
         modifier = Modifier
@@ -41,12 +41,38 @@ fun HabitCard(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = habit.title,
-                modifier = Modifier.weight(1f),
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = habit.title,
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
+                
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.8f),
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    
+                    val plannedTimeStr = habit.reminderTime?.format(timeFormatter) ?: "--:--"
+                    val suggestionText = timeSuggestion?.let { 
+                        " -> зазвичай о ${it.suggestedTime.format(timeFormatter)}"
+                    } ?: ""
+                    
+                    Text(
+                        text = "$plannedTimeStr$suggestionText",
+                        color = Color.White.copy(alpha = 0.8f),
+                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp)
+                    )
+                }
+            }
+            
             Checkbox(
                 checked = isCompletedToday,
                 onCheckedChange = { onToggleHabit() },

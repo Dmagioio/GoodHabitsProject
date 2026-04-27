@@ -30,19 +30,16 @@ class ReminderReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val habitTitle = intent.getStringExtra("HABIT_TITLE") ?: context.getString(R.string.notification_default_text)
+        val habitMotivation = intent.getStringExtra("HABIT_MOTIVATION") ?: ""
         val habitId = intent.getIntExtra("HABIT_ID", -1)
         Log.d("ALARM_RECEIVER", "СИГНАЛ Є! $habitTitle")
 
         CoroutineScope(Dispatchers.Main).launch {
-            // Реплануємо будильник на завтра
             if (habitId != -1) {
                 val now = LocalTime.now()
-                // Використовуємо той самий час, що був встановлений
-                // Для простоти візьмемо поточну годину/хвилину, але в реалі 
-                // краще було б передавати початковий час через intent
                 val scheduledHour = intent.getIntExtra("SCHEDULED_HOUR", now.hour)
                 val scheduledMinute = intent.getIntExtra("SCHEDULED_MINUTE", now.minute)
-                reminderScheduler.schedule(habitId, habitTitle, LocalTime.of(scheduledHour, scheduledMinute))
+                reminderScheduler.schedule(habitId, habitTitle, LocalTime.of(scheduledHour, scheduledMinute), habitMotivation)
             }
 
             val notificationsEnabled = settingsRepository.globalNotificationsEnabled.first()
@@ -64,18 +61,25 @@ class ReminderReceiver : BroadcastReceiver() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
+            val contentText = if (habitMotivation.isNotEmpty()) {
+                "Мотивація: \"$habitMotivation\""
+            } else {
+                habitTitle
+            }
+
             val notification = NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-                .setContentTitle(context.getString(R.string.notification_content_title))
-                .setContentText(habitTitle)
+                .setContentTitle(habitTitle)
+                .setContentText(contentText)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
                 .build()
 
-            val notificationId = System.currentTimeMillis().toInt()
+            val notificationId = habitId
             if (androidx.core.content.ContextCompat.checkSelfPermission(
                     context, android.Manifest.permission.POST_NOTIFICATIONS
                 ) == android.content.pm.PackageManager.PERMISSION_GRANTED) {

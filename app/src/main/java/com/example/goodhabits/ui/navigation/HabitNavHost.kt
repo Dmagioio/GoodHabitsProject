@@ -45,7 +45,9 @@ fun HabitApp(viewModel: HabitViewModel = hiltViewModel()) {
         onOpenIdeas = { navController.navigate(Screen.Ideas.route) },
         onBackToMain = { navController.popBackStack() },
         onAddHabit = { viewModel.addHabit() },
-        onUpdateHabit = { id, title, color, days, time -> viewModel.updateHabit(id, title, color, days, time) },
+        onUpdateHabit = { id, title, color, days, isReminderEnabled, motivation -> 
+            viewModel.updateHabit(id, title, color, days, isReminderEnabled, motivation) 
+        },
         onDeleteHabit = { id -> viewModel.deleteHabit(id) },
         onToggleHabitToday = { habitId -> viewModel.toggleHabitToday(habitId) },
         onToggleHabitForDate = { habitId, date -> viewModel.toggleHabitForDate(habitId, date) }
@@ -64,7 +66,7 @@ fun HabitNavHost(
     onOpenEditHabit: (Habit) -> Unit,
     onBackToMain: () -> Unit,
     onAddHabit: () -> Unit,
-    onUpdateHabit: (Int, String, Color, Set<String>, Boolean) -> Unit,
+    onUpdateHabit: (Int, String, Color, Set<String>, Boolean, String) -> Unit,
     onDeleteHabit: (Int) -> Unit,
     onToggleHabitToday: (Int) -> Unit,
     onToggleHabitForDate: (Int, LocalDate) -> Unit
@@ -77,6 +79,23 @@ fun HabitNavHost(
             MainScreen(
                 habits = state.habits,
                 currentStreak = state.currentStreak,
+                timeSuggestions = state.timeSuggestions,
+                dismissedSuggestions = state.dismissedSuggestions,
+                onDismissSuggestion = { habitId -> viewModel.dismissSuggestion(habitId) },
+                onApplySuggestion = { suggestion -> 
+                    val habit = state.habits.find { it.id == suggestion.habitId }
+                    if (habit != null) {
+                        viewModel.updateHabit(
+                            id = habit.id,
+                            title = habit.title,
+                            color = Color(habit.colorHex.toInt()),
+                            days = habit.days,
+                            isReminderEnabled = true,
+                            time = suggestion.suggestedTime
+                        )
+                    }
+                    viewModel.dismissSuggestion(suggestion.habitId)
+                },
                 onOpenAddHabit = onOpenAddHabit,
                 onOpenAnalytics = onOpenAnalytics,
                 onOpenSettings = onOpenSettings,
@@ -165,8 +184,8 @@ fun HabitNavHost(
                 EditHabitScreen(
                     habit = habit,
                     onBack = onBackToMain,
-                    onSaveHabit = { id, title, color, days, time ->
-                        onUpdateHabit(id, title, color, days, time)
+                    onSaveHabit = { id, title, color, days, time, motivation ->
+                        onUpdateHabit(id, title, color, days, time, motivation)
                         onBackToMain()
                     },
                     onDeleteHabit = { id ->

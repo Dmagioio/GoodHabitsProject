@@ -1,6 +1,7 @@
 package com.example.goodhabits.domain.repository
 
 import com.example.goodhabits.domain.model.Habit
+import com.example.goodhabits.domain.model.HabitCompletionHistory
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -20,4 +21,8 @@ interface HabitRepository {
     suspend fun toggleHabitForDate(id: Int, date: LocalDate)
 
     suspend fun deleteAllHabits()
+
+    // History methods
+    fun observeAllHistory(): Flow<List<HabitCompletionHistory>>
+    suspend fun getLastHistoryRecords(habitId: Int, limit: Int): List<HabitCompletionHistory>
 }

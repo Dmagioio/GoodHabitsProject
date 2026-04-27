@@ -12,4 +12,5 @@ data class HabitEntity(
     val completedDates: Set<Long> = emptySet(),
     val days: Set<String> = emptySet(),
     val reminderTime: java.time.LocalTime? = null,
+    val motivation: String = ""
 )

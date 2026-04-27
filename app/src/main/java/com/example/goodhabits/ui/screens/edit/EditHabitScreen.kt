@@ -44,6 +44,7 @@ import com.example.goodhabits.ui.components.ColorCircle
 import com.example.goodhabits.ui.components.DayChip
 import com.example.goodhabits.ui.components.HabitTimePicker
 import androidx.compose.foundation.background
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Brush
 import com.example.goodhabits.ui.theme.*
 
@@ -52,7 +53,7 @@ import com.example.goodhabits.ui.theme.*
 fun EditHabitScreen(
     habit: Habit,
     onBack: () -> Unit,
-    onSaveHabit: (Int, String, Color, Set<String>, Boolean) -> Unit,
+    onSaveHabit: (Int, String, Color, Set<String>, Boolean, String) -> Unit,
     onDeleteHabit: (Int) -> Unit,
     viewModel: HabitViewModel
 ) {
@@ -87,15 +88,21 @@ fun EditHabitScreen(
 fun EditHabitContent(
     habit: Habit,
     modifier: Modifier = Modifier,
-    onSaveHabit: (Int, String, Color, Set<String>, Boolean) -> Unit,
+    onSaveHabit: (Int, String, Color, Set<String>, Boolean, String) -> Unit,
     onDeleteHabit: (Int) -> Unit,
     viewModel: HabitViewModel
 ) {
     var title by remember(habit.id) { mutableStateOf(habit.title) }
-    var motivation by remember { mutableStateOf("") }
-    var reminderEnabled by remember { mutableStateOf(false) }
+    var motivation by remember(habit.id) { mutableStateOf(habit.motivation) }
+    var reminderEnabled by remember(habit.id) { mutableStateOf(habit.reminderTime != null) }
     var deleteChecked by remember(habit.id) { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+
+    LaunchedEffect(habit.id) {
+        habit.reminderTime?.let {
+            viewModel.updateReminderTime(it.hour, it.minute)
+        }
+    }
 
     val pickedTime by viewModel.reminderTime.collectAsState()
     val context = LocalContext.current
@@ -234,7 +241,7 @@ fun EditHabitContent(
         Button(
             onClick = {
                 if (title.isNotBlank()) {
-                    onSaveHabit(habit.id, title, selectedColor, selectedDays, reminderEnabled)
+                    onSaveHabit(habit.id, title, selectedColor, selectedDays, reminderEnabled, motivation)
                 }
             },
             modifier = Modifier

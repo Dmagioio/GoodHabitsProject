@@ -12,7 +12,7 @@ class RescheduleHabitRemindersUseCase @Inject constructor(
         val habits = repository.getHabits()
         habits.forEach { habit ->
             habit.reminderTime?.let { time ->
-                reminderScheduler.schedule(habit.id, habit.title, time)
+                reminderScheduler.schedule(habit.id, habit.title, time, habit.motivation)
             }
         }
     }

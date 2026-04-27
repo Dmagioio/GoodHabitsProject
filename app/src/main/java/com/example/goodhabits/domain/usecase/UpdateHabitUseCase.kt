@@ -15,13 +15,14 @@ class UpdateHabitUseCase @Inject constructor(
             title = habit.title,
             colorHex = habit.colorHex,
             days = habit.days,
-            reminderTime = habit.reminderTime
+            reminderTime = habit.reminderTime,
+            motivation = habit.motivation
         )
 
         repository.updateHabit(updatedHabit)
 
         if (updatedHabit.reminderTime != null) {
-            reminderScheduler.schedule(updatedHabit.id, updatedHabit.title, updatedHabit.reminderTime)
+            reminderScheduler.schedule(updatedHabit.id, updatedHabit.title, updatedHabit.reminderTime, updatedHabit.motivation)
         } else {
             reminderScheduler.cancel(updatedHabit.id)
         }

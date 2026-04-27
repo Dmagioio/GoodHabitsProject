@@ -25,4 +25,10 @@ class HabitTypeConverters {
 
     @TypeConverter
     fun toReminderTime(value: String?): LocalTime? = value?.takeIf { it.isNotBlank() }?.let(LocalTime::parse)
+
+    @TypeConverter
+    fun fromLocalDate(value: java.time.LocalDate?): String? = value?.toString()
+
+    @TypeConverter
+    fun toLocalDate(value: String?): java.time.LocalDate? = value?.takeIf { it.isNotBlank() }?.let(java.time.LocalDate::parse)
 }

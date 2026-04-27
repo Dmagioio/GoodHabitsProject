@@ -11,7 +11,7 @@ class AddHabitUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(habit: Habit): Int {
         val habitId = repository.addHabit(habit)
-        habit.reminderTime?.let { reminderScheduler.schedule(habitId, habit.title, it) }
+        habit.reminderTime?.let { reminderScheduler.schedule(habitId, habit.title, it, habit.motivation) }
         return habitId
     }
 }

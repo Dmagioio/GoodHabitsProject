@@ -3,7 +3,9 @@ package com.example.goodhabits.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.ui.graphics.Color
+import com.example.goodhabits.domain.analysis.BehavioralAnalysisEngine
 import com.example.goodhabits.domain.model.Habit
+import com.example.goodhabits.domain.repository.ReminderScheduler
 import com.example.goodhabits.domain.usecase.AddHabitUseCase
 import com.example.goodhabits.domain.usecase.DeleteHabitUseCase
 import com.example.goodhabits.domain.usecase.ObserveHabitsUseCase
@@ -23,17 +25,21 @@ class HabitViewModel @Inject constructor(
     addHabitUseCase: AddHabitUseCase,
     updateHabitUseCase: UpdateHabitUseCase,
     deleteHabitUseCase: DeleteHabitUseCase,
-    toggleHabitForDateUseCase: ToggleHabitForDateUseCase
+    toggleHabitForDateUseCase: ToggleHabitForDateUseCase,
+    private val analysisEngine: BehavioralAnalysisEngine,
+    private val reminderScheduler: ReminderScheduler
 ) : ViewModel() {
     private val draftStateHolder = HabitDraftStateHolder()
-    private val screenStateHolder = HabitScreenStateHolder()
+    private val screenStateHolder = HabitScreenStateHolder(analysisEngine)
     private val actionHandler = HabitActionHandler(
         addHabitUseCase = addHabitUseCase,
         updateHabitUseCase = updateHabitUseCase,
         deleteHabitUseCase = deleteHabitUseCase,
         toggleHabitForDateUseCase = toggleHabitForDateUseCase,
         draftStateHolder = draftStateHolder,
-        screenStateHolder = screenStateHolder
+        screenStateHolder = screenStateHolder,
+        analysisEngine = analysisEngine,
+        reminderScheduler = reminderScheduler
     )
 
     val draftTitle: StateFlow<String> = draftStateHolder.draftTitle
@@ -68,9 +74,9 @@ class HabitViewModel @Inject constructor(
         }
     }
 
-    fun updateHabit(id: Int, title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean) {
+    fun updateHabit(id: Int, title: String, color: Color, days: Set<String>, isReminderEnabled: Boolean, motivation: String = "", time: LocalTime? = null) {
         viewModelScope.launch {
-            actionHandler.updateHabit(id, title, color, days, isReminderEnabled)
+            actionHandler.updateHabit(id, title, color, days, isReminderEnabled, motivation, time)
         }
     }
 
@@ -94,5 +100,9 @@ class HabitViewModel @Inject constructor(
 
     fun clearError() {
         screenStateHolder.setError(null)
+    }
+
+    fun dismissSuggestion(habitId: Int) {
+        screenStateHolder.dismissSuggestion(habitId)
     }
 }

@@ -42,6 +42,10 @@ fun AnalyticsScreen(
     viewModel: AnalyticsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val accentColor = remember(uiState.selectedHabitId, uiState.habits) {
+        val selectedHabit = uiState.habits.find { it.id == uiState.selectedHabitId }
+        if (selectedHabit != null) Color(selectedHabit.colorHex) else Color(0xFF4DB6AC)
+    }
 
     Scaffold(
         topBar = {
@@ -157,9 +161,9 @@ fun AnalyticsScreen(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     if (uiState.period == AnalyticsPeriod.Weekly) {
-                        WeeklyBarChart(viewModel.getCompletionsPerDayOfWeek())
+                        WeeklyBarChart(viewModel.getCompletionsPerDayOfWeek(), accentColor)
                     } else {
-                        MonthlyBarChart(viewModel.getCompletionsPerDayOfMonth(), uiState.currentMonth)
+                        MonthlyBarChart(viewModel.getCompletionsPerDayOfMonth(), uiState.currentMonth, accentColor)
                     }
                 }
             }
@@ -187,14 +191,14 @@ fun AnalyticsScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(onClick = { viewModel.previousMonth() }) {
-                            Icon(Icons.Default.ChevronLeft, contentDescription = null, tint = Color(0xFF4DB6AC))
+                            Icon(Icons.Default.ChevronLeft, contentDescription = null, tint = accentColor)
                         }
                         Text(
                             text = "${uiState.currentMonth.month.getDisplayName(TextStyle.FULL, Locale.forLanguageTag("uk"))} ${uiState.currentMonth.year}",
                             fontWeight = FontWeight.Medium
                         )
                         IconButton(onClick = { viewModel.nextMonth() }) {
-                            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color(0xFF4DB6AC))
+                            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = accentColor)
                         }
                     }
 
@@ -242,13 +246,13 @@ fun AnalyticsScreen(
                                                 modifier = Modifier
                                                     .size(32.dp)
                                                     .clip(CircleShape)
-                                                    .background(Color(0xFF4DB6AC))
+                                                    .background(accentColor)
                                             )
                                         }
                                         Text(
                                             text = "$currentDay",
-                                            color = if (isCompleted) Color.White else if (date == LocalDate.now()) Color(0xFF4DB6AC) else Color.Black,
-                                            fontSize = 14.sp
+                                            color = if (isCompleted) Color.White else if (date == LocalDate.now()) accentColor else Color.Black,
+                                            style = MaterialTheme.typography.bodyMedium
                                         )
                                     }
                                     currentDay++
@@ -265,7 +269,7 @@ fun AnalyticsScreen(
 }
 
 @Composable
-fun WeeklyBarChart(completionsPerDay: Map<DayOfWeek, Int>) {
+fun WeeklyBarChart(completionsPerDay: Map<DayOfWeek, Int>, accentColor: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -306,7 +310,7 @@ fun WeeklyBarChart(completionsPerDay: Map<DayOfWeek, Int>) {
                             .fillMaxWidth()
                             .fillMaxHeight(progress)
                             .clip(RoundedCornerShape(15.dp))
-                            .background(if (count > 0) Color(0xFF4DB6AC) else Color.Transparent)
+                            .background(if (count > 0) accentColor else Color.Transparent)
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -325,7 +329,7 @@ fun WeeklyBarChart(completionsPerDay: Map<DayOfWeek, Int>) {
 }
 
 @Composable
-fun MonthlyBarChart(completionsPerDay: Map<Int, Int>, currentMonth: YearMonth) {
+fun MonthlyBarChart(completionsPerDay: Map<Int, Int>, currentMonth: YearMonth, accentColor: Color) {
     val daysInMonth = currentMonth.lengthOfMonth()
     val maxCompletions = completionsPerDay.values.maxOrNull() ?: 1
 
@@ -344,19 +348,10 @@ fun MonthlyBarChart(completionsPerDay: Map<Int, Int>, currentMonth: YearMonth) {
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(Color(0xFFF5F5F5)),
-                    contentAlignment = Alignment.BottomCenter
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(progress)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(if (count > 0) Color(0xFF4DB6AC) else Color.Transparent)
-                    )
-                }
+                        .fillMaxHeight(progress.coerceAtLeast(0.05f))
+                        .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp))
+                        .background(if (count > 0) accentColor else Color(0xFFF5F5F5))
+                )
             }
         }
         Spacer(modifier = Modifier.height(8.dp))

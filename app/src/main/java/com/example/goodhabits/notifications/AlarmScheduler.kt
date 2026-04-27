@@ -21,9 +21,10 @@ class AlarmScheduler @Inject constructor(
 
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    override fun schedule(habitId: Int, habitTitle: String, time: LocalTime) {
+    override fun schedule(habitId: Int, habitTitle: String, time: LocalTime, motivation: String) {
         val intent = Intent(context, ReminderReceiver::class.java).apply {
             putExtra("HABIT_TITLE", habitTitle)
+            putExtra("HABIT_MOTIVATION", motivation)
             putExtra("HABIT_ID", habitId)
             putExtra("SCHEDULED_HOUR", time.hour)
             putExtra("SCHEDULED_MINUTE", time.minute)

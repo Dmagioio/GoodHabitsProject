@@ -242,7 +242,7 @@ fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) 
         Text(
             text = title,
             fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+            color = Color.Black,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
         )

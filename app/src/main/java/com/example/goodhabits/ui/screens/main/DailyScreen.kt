@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.goodhabits.domain.analysis.TimeAdaptationSuggestion
 import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.components.DateHeader
 import com.example.goodhabits.ui.components.HabitCard
@@ -24,17 +25,17 @@ import java.time.LocalDate
 @Composable
 fun DailyScreen(
     habits: List<Habit>,
+    timeSuggestions: Map<Int, TimeAdaptationSuggestion> = emptyMap(),
     onToggleHabitToday: (Habit) -> Unit,
     onHabitClick: (Habit) -> Unit
 ) {
     val today = LocalDate.now().toEpochDay()
-
+    
     val todayNow = LocalDate.now()
     val dayOfWeek = todayNow.dayOfWeek.getDisplayName(
         java.time.format.TextStyle.SHORT,
-        java.util.Locale("uk")
+        java.util.Locale.forLanguageTag("uk")
     ).replaceFirstChar { it.uppercase() }
-
 
     val filteredHabits = habits.filter { habit ->
         habit.days.contains(dayOfWeek)
@@ -69,6 +70,7 @@ fun DailyScreen(
                     HabitCard(
                         habit = habit,
                         isCompletedToday = isCompletedToday,
+                        timeSuggestion = timeSuggestions[habit.id],
                         onToggleHabit = { onToggleHabitToday(habit) },
                         onClick = { onHabitClick(habit) }
                     )

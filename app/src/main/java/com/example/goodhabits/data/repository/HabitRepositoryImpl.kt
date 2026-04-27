@@ -1,13 +1,16 @@
 package com.example.goodhabits.data.repository
 
 import com.example.goodhabits.data.local.datasource.HabitLocalDataSource
+import com.example.goodhabits.data.local.entity.HabitCompletionHistoryEntity
 import com.example.goodhabits.data.mapper.HabitMapper
 import com.example.goodhabits.domain.model.Habit
+import com.example.goodhabits.domain.model.HabitCompletionHistory
 import com.example.goodhabits.domain.repository.HabitRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
+import java.time.LocalTime
 
 class HabitRepositoryImpl @Inject constructor(
     private val localDataSource: HabitLocalDataSource,
@@ -34,18 +37,37 @@ class HabitRepositoryImpl @Inject constructor(
     }
 
     override suspend fun toggleHabitForDate(id: Int, date: LocalDate) {
-        val habit = localDataSource.getHabitById(id) ?: return
-        val updatedDates = habit.completedDates.toMutableSet()
+        val habitEntity = localDataSource.getHabitById(id) ?: return
+        val updatedDates = habitEntity.completedDates.toMutableSet()
         val key = date.toEpochDay()
 
-        if (!updatedDates.add(key)) {
+        val isCompleting = updatedDates.add(key)
+        if (!isCompleting) {
             updatedDates.remove(key)
+            // If we are un-completing, we might want to handle history, 
+            // but for simplicity we'll just insert on completion.
+        } else {
+            // Log history
+            localDataSource.insertHistory(
+                HabitCompletionHistoryEntity(
+                    habitId = id,
+                    plannedTime = habitEntity.reminderTime,
+                    actualTime = LocalTime.now(),
+                    date = date
+                )
+            )
         }
 
-        localDataSource.updateHabit(habit.copy(completedDates = updatedDates))
+        localDataSource.updateHabit(habitEntity.copy(completedDates = updatedDates))
     }
 
     override suspend fun deleteAllHabits() {
         localDataSource.deleteAll()
     }
+
+    override fun observeAllHistory(): Flow<List<HabitCompletionHistory>> =
+        localDataSource.getAllHistory().map { entities -> entities.map(mapper::historyToDomain) }
+
+    override suspend fun getLastHistoryRecords(habitId: Int, limit: Int): List<HabitCompletionHistory> =
+        localDataSource.getLastHistoryRecords(habitId, limit).map(mapper::historyToDomain)
 }

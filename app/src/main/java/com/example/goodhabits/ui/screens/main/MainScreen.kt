@@ -55,10 +55,14 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.goodhabits.domain.analysis.TimeAdaptationSuggestion
+
 enum class TabScreen(val titleRes: Int) {
     Daily(R.string.daily_tab),
     Weekly(R.string.weekly_tab),
@@ -127,6 +131,10 @@ fun StreakCard(streak: Int) {
 fun MainScreen(
     habits: List<Habit>,
     currentStreak: Int = 0,
+    timeSuggestions: Map<Int, TimeAdaptationSuggestion> = emptyMap(),
+    dismissedSuggestions: Set<Int> = emptySet(),
+    onDismissSuggestion: (Int) -> Unit = {},
+    onApplySuggestion: (TimeAdaptationSuggestion) -> Unit = {},
     onOpenAddHabit: () -> Unit,
     onOpenAnalytics: () -> Unit,
     onOpenSettings: () -> Unit,
@@ -141,9 +149,49 @@ fun MainScreen(
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     var gesturesEnabled by remember { mutableStateOf(false) }
 
+    val pendingSuggestions = timeSuggestions.filter { (id, _) -> !dismissedSuggestions.contains(id) }.values.toList()
+    var currentSuggestionToShow by remember { mutableStateOf<TimeAdaptationSuggestion?>(null) }
+
+    LaunchedEffect(pendingSuggestions) {
+        if (pendingSuggestions.isNotEmpty() && currentSuggestionToShow == null) {
+            currentSuggestionToShow = pendingSuggestions.first()
+        }
+    }
+
+    if (currentSuggestionToShow != null) {
+        val suggestion = currentSuggestionToShow!!
+        val timeFormatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm")
+        
+        AlertDialog(
+            onDismissRequest = { 
+                onDismissSuggestion(suggestion.habitId)
+                currentSuggestionToShow = null 
+            },
+            title = { Text("Оптимізація часу") },
+            text = { 
+                Text("Я бачу, ти зазвичай виконуєш звичку \"${suggestion.habitTitle}\" о ${suggestion.suggestedTime.format(timeFormatter)}. Перенести нагадування з ${suggestion.currentPlannedTime?.format(timeFormatter) ?: "--:--"} на цей час?") 
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onApplySuggestion(suggestion)
+                    currentSuggestionToShow = null
+                }) {
+                    Text("Так, перенести")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    onDismissSuggestion(suggestion.habitId)
+                    currentSuggestionToShow = null
+                }) {
+                    Text("Ні, дякую")
+                }
+            }
+        )
+    }
+
     LaunchedEffect(Unit) {
-        drawerState.snapTo(DrawerValue.Closed)
-        delay(500)
+        delay(150)
         gesturesEnabled = true
     }
 
@@ -324,6 +372,7 @@ fun MainScreen(
                         when (TabScreen.entries[targetIndex]) {
                             TabScreen.Daily -> DailyScreen(
                                 habits = habits,
+                                timeSuggestions = timeSuggestions,
                                 onToggleHabitToday = { habit ->
                                     onToggleHabitToday(habit.id)
                                 },

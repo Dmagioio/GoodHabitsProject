@@ -8,8 +8,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
+import com.example.goodhabits.data.local.dao.HabitCompletionHistoryDao
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import jakarta.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -22,8 +23,14 @@ object DatabaseModule {
         context,
         HabitDatabase::class.java,
         "good_habits.db"
-    ).build()
+    )
+    .fallbackToDestructiveMigration() // Added to handle database version changes for simplicity in development
+    .build()
 
     @Provides
     fun provideHabitDao(database: HabitDatabase): HabitDao = database.habitDao()
+
+    @Provides
+    fun provideHabitCompletionHistoryDao(database: HabitDatabase): HabitCompletionHistoryDao = 
+        database.habitCompletionHistoryDao()
 }
