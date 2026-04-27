@@ -194,7 +194,7 @@ fun AnalyticsScreen(
                             Icon(Icons.Default.ChevronLeft, contentDescription = null, tint = accentColor)
                         }
                         Text(
-                            text = "${uiState.currentMonth.month.getDisplayName(TextStyle.FULL, Locale.forLanguageTag("uk"))} ${uiState.currentMonth.year}",
+                            text = "${uiState.currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }} ${uiState.currentMonth.year}",
                             fontWeight = FontWeight.Medium
                         )
                         IconButton(onClick = { viewModel.nextMonth() }) {
@@ -205,7 +205,15 @@ fun AnalyticsScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Row(modifier = Modifier.fillMaxWidth()) {
-                        val daysOfWeek = listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб")
+                        val daysOfWeek = listOf(
+                            stringResource(R.string.day_su),
+                            stringResource(R.string.day_mo),
+                            stringResource(R.string.day_tu),
+                            stringResource(R.string.day_we),
+                            stringResource(R.string.day_th),
+                            stringResource(R.string.day_fr),
+                            stringResource(R.string.day_sa)
+                        )
                         daysOfWeek.forEach { day ->
                             Text(
                                 text = day,
@@ -277,7 +285,15 @@ fun WeeklyBarChart(completionsPerDay: Map<DayOfWeek, Int>, accentColor: Color) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Bottom
     ) {
-        val days = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд")
+        val days = listOf(
+            stringResource(R.string.day_mo),
+            stringResource(R.string.day_tu),
+            stringResource(R.string.day_we),
+            stringResource(R.string.day_th),
+            stringResource(R.string.day_fr),
+            stringResource(R.string.day_sa),
+            stringResource(R.string.day_su)
+        )
         val maxCompletions = completionsPerDay.values.maxOrNull() ?: 1
 
         days.forEachIndexed { index, day ->

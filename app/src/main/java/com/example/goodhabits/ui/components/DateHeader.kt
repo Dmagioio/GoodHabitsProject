@@ -14,19 +14,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
 fun DateHeader() {
-    val calendar = remember { Calendar.getInstance() }
-    val dayFormatter = remember { SimpleDateFormat("EEE", Locale("uk")) }
-    val dateFormatter = remember { SimpleDateFormat("dd/MM/yy", Locale.getDefault()) }
+    val today = remember { LocalDate.now() }
+    val dayFormatter = remember(Locale.getDefault()) { DateTimeFormatter.ofPattern("EEEE", Locale.getDefault()) }
+    val dateFormatter = remember(Locale.getDefault()) { DateTimeFormatter.ofPattern("dd/MM/yy", Locale.getDefault()) }
 
-    val dayName = dayFormatter.format(calendar.time)
+    val dayName = today.format(dayFormatter)
         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-    val dateText = dateFormatter.format(calendar.time)
+    val dateText = today.format(dateFormatter)
 
     Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
         Text(

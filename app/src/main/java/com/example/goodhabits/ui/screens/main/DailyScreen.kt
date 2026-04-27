@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.goodhabits.R
 import com.example.goodhabits.domain.analysis.TimeAdaptationSuggestion
 import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.components.DateHeader
@@ -33,13 +35,18 @@ fun DailyScreen(
     val today = LocalDate.now().toEpochDay()
     
     val todayNow = LocalDate.now()
-    val dayOfWeek = todayNow.dayOfWeek.getDisplayName(
-        java.time.format.TextStyle.SHORT,
-        java.util.Locale.forLanguageTag("uk")
-    ).replaceFirstChar { it.uppercase() }
+    val internalDayOfWeek = when (todayNow.dayOfWeek) {
+        java.time.DayOfWeek.SUNDAY -> "SU"
+        java.time.DayOfWeek.MONDAY -> "MO"
+        java.time.DayOfWeek.TUESDAY -> "TU"
+        java.time.DayOfWeek.WEDNESDAY -> "WE"
+        java.time.DayOfWeek.THURSDAY -> "TH"
+        java.time.DayOfWeek.FRIDAY -> "FR"
+        java.time.DayOfWeek.SATURDAY -> "SA"
+    }
 
     val filteredHabits = habits.filter { habit ->
-        habit.days.contains(dayOfWeek)
+        habit.days.contains(internalDayOfWeek)
     }
 
     Column(
@@ -65,7 +72,7 @@ fun DailyScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Натисніть +, щоб додати першу звичку",
+                    text = stringResource(R.string.empty_daily_habits_msg),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )

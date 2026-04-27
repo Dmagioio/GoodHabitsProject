@@ -106,7 +106,15 @@ fun AddHabitContent(
     )
     val selectedColor by viewModel.draftSelectedColor.collectAsState()
 
-    val habitDays = listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб")
+    val habitDays = listOf(
+        "SU" to stringResource(R.string.day_su),
+        "MO" to stringResource(R.string.day_mo),
+        "TU" to stringResource(R.string.day_tu),
+        "WE" to stringResource(R.string.day_we),
+        "TH" to stringResource(R.string.day_th),
+        "FR" to stringResource(R.string.day_fr),
+        "SA" to stringResource(R.string.day_sa)
+    )
     val selectedDays by viewModel.draftSelectedDays.collectAsState()
 
     Column(
@@ -127,12 +135,12 @@ fun AddHabitContent(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            habitDays.forEach { day ->
+            habitDays.forEach { (internalDay, displayDay) ->
                 DayChip(
-                    text = day,
-                    isSelected = selectedDays.contains(day),
+                    text = displayDay,
+                    isSelected = selectedDays.contains(internalDay),
                     onClick = {
-                        val newDays = if (selectedDays.contains(day)) selectedDays - day else selectedDays + day
+                        val newDays = if (selectedDays.contains(internalDay)) selectedDays - internalDay else selectedDays + internalDay
                         viewModel.updateDraftDays(newDays)
                     }
                 )

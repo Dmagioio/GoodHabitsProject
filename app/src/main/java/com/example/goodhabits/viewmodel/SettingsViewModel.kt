@@ -23,7 +23,7 @@ class SettingsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppTheme.SYSTEM)
 
     val language: StateFlow<AppLanguage> = settingsRepository.language
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppLanguage.UK)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AppLanguage.SYSTEM)
 
     val globalNotificationsEnabled: StateFlow<Boolean> = settingsRepository.globalNotificationsEnabled
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)

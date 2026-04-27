@@ -13,9 +13,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.example.goodhabits.R
 import com.example.goodhabits.domain.analysis.TimeAdaptationSuggestion
 import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.domain.model.calculateStreak
+import com.example.goodhabits.ui.theme.StreakOrange
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -49,17 +52,16 @@ fun HabitCard(
                         text = habit.title,
                         color = Color.White,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                        modifier = Modifier.weight(1f, fill = false)
+                        modifier = Modifier.weight(1f)
                     )
                     
                     if (streak > 0) {
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "🔥 $streak",
-                            color = Color.White,
+                            color = StreakOrange,
                             style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFF9800) // Orange color for the streak
+                                fontWeight = FontWeight.Bold
                             )
                         )
                     }
@@ -79,7 +81,7 @@ fun HabitCard(
                     
                     val plannedTimeStr = habit.reminderTime?.format(timeFormatter) ?: "--:--"
                     val suggestionText = timeSuggestion?.let { 
-                        " -> зазвичай о ${it.suggestedTime.format(timeFormatter)}"
+                        stringResource(R.string.usually_at, it.suggestedTime.format(timeFormatter))
                     } ?: ""
                     
                     Text(

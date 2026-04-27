@@ -194,7 +194,12 @@ fun SettingsScreen(
                             onClick = { viewModel.setLanguage(AppLanguage.EN) },
                             modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.weight(1f))
+                        ThemeOption(
+                            title = stringResource(R.string.language_system),
+                            selected = language == AppLanguage.SYSTEM,
+                            onClick = { viewModel.setLanguage(AppLanguage.SYSTEM) },
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }
@@ -242,7 +247,7 @@ fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) 
         Text(
             text = title,
             fontSize = 12.sp,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
         )
@@ -299,8 +304,8 @@ fun ThemeOption(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(8.dp),
-        color = if (selected) Purple else Color(0xFFF5F5F5),
-        contentColor = if (selected) Color.White else Color.Black,
+        color = if (selected) Purple else MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier.height(40.dp)
     ) {
         Box(contentAlignment = Alignment.Center) {

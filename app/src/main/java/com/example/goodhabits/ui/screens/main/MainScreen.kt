@@ -96,7 +96,7 @@ fun StreakCard(streak: Int) {
             ) {
                 Text(
                     text = if (streak > 0) 
-                        stringResource(R.string.streak_label) 
+                        stringResource(R.string.streak_label_all)
                     else 
                         stringResource(R.string.streak_start_msg),
                     color = Color.White,

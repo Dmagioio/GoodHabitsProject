@@ -7,7 +7,7 @@ enum class AppTheme {
 }
 
 enum class AppLanguage {
-    UK, EN
+    UK, EN, SYSTEM
 }
 
 interface SettingsRepository {

@@ -135,16 +135,24 @@ fun EditHabitContent(
 
         Text(text = stringResource(R.string.do_it_on))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            val allDays = listOf("Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб")
-            allDays.forEach { day ->
+            val allDays = listOf(
+                "SU" to stringResource(R.string.day_su),
+                "MO" to stringResource(R.string.day_mo),
+                "TU" to stringResource(R.string.day_tu),
+                "WE" to stringResource(R.string.day_we),
+                "TH" to stringResource(R.string.day_th),
+                "FR" to stringResource(R.string.day_fr),
+                "SA" to stringResource(R.string.day_sa)
+            )
+            allDays.forEach { (internalDay, displayDay) ->
                 DayChip(
-                    text = day,
-                    isSelected = selectedDays.contains(day),
+                    text = displayDay,
+                    isSelected = selectedDays.contains(internalDay),
                     onClick = {
-                        selectedDays = if (selectedDays.contains(day)) {
-                            selectedDays - day
+                        selectedDays = if (selectedDays.contains(internalDay)) {
+                            selectedDays - internalDay
                         } else {
-                            selectedDays + day
+                            selectedDays + internalDay
                         }
                     }
                 )

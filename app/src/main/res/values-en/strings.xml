@@ -61,7 +61,49 @@
     <string name="language_label">Language</string>
     <string name="language_uk">Ukrainian</string>
     <string name="language_en">English</string>
+    <string name="language_system">System</string>
     <string name="streak_days">%d days</string>
     <string name="streak_label">Your current streak</string>
+    <string name="streak_label_all">Streak all</string>
     <string name="streak_start_msg">Start a new streak by completing habits</string>
+    <string name="empty_daily_habits_msg">Tap + to add your first habit</string>
+    <string name="usually_at"> -> usually at %s</string>
+    <string name="day_su">Su</string>
+    <string name="day_mo">Mo</string>
+    <string name="day_tu">Tu</string>
+    <string name="day_we">We</string>
+    <string name="day_th">Th</string>
+    <string name="day_fr">Fr</string>
+    <string name="day_sa">Sa</string>
+    
+    <!-- Ideas Categories -->
+    <string name="category_perfect_morning">Perfect morning</string>
+    <string name="category_perfect_morning_desc">Breakfast, shower, exercises and more...</string>
+    <string name="idea_morning_warmup">Morning warm-up</string>
+    <string name="idea_early_wakeup">Early wake up</string>
+    <string name="idea_water_morning">A glass of water in the morning</string>
+    <string name="idea_read_bed">Read a book in bed for 15 minutes</string>
+    <string name="idea_contrast_shower">Cold and hot shower</string>
+    <string name="idea_new_breakfast">Breakfast with a new recipe</string>
+    <string name="idea_plan_day">Plan your day</string>
+    
+    <string name="category_self_development">Self-development</string>
+    <string name="category_self_development_desc">Reading, meditation and more...</string>
+    <string name="idea_read_30m">Read a book for 30 minutes</string>
+    <string name="idea_listen_podcast">Listen to 1 podcast</string>
+    <string name="idea_learn_words">Learn 10 foreign words</string>
+    <string name="idea_watch_lesson">Watch 1 online lesson</string>
+    <string name="idea_meditation">Meditation</string>
+    <string name="idea_yoga">Yoga</string>
+    <string name="idea_plan_tasks">Plan tasks</string>
+    <string name="idea_play_chess">Play chess</string>
+    <string name="idea_watch_movie">Watch a movie</string>
+    
+    <string name="category_family">Family</string>
+    <string name="category_family_desc">Parents, kids, dance and more...</string>
+    <string name="idea_family_dinner">Dinner with family</string>
+    <string name="idea_call_parents">Call parents</string>
+    <string name="idea_play_kids">Play with kids</string>
+    <string name="idea_family_walk">Walk together</string>
+    <string name="idea_share_success">Share the successes of the day</string>
 </resources>

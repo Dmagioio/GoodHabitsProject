@@ -61,7 +61,49 @@
     <string name="language_label">Мова</string>
     <string name="language_uk">Українська</string>
     <string name="language_en">Англійська</string>
+    <string name="language_system">Системна</string>
     <string name="streak_days">%d днів</string>
-    <string name="streak_label">Загальний стрік</string>
+    <string name="streak_label">Ваш поточний стрік</string>
+    <string name="streak_label_all">Загальний стрік</string>
     <string name="streak_start_msg">Почни новий стрік, виконуючи звички</string>
+    <string name="empty_daily_habits_msg">Натисніть +, щоб додати першу звичку</string>
+    <string name="usually_at"> -> зазвичай о %s</string>
+    <string name="day_su">Нд</string>
+    <string name="day_mo">Пн</string>
+    <string name="day_tu">Вт</string>
+    <string name="day_we">Ср</string>
+    <string name="day_th">Чт</string>
+    <string name="day_fr">Пт</string>
+    <string name="day_sa">Сб</string>
+    
+    <!-- Ideas Categories -->
+    <string name="category_perfect_morning">Ідеальний ранок</string>
+    <string name="category_perfect_morning_desc">Сніданок, душ, вправи та інше...</string>
+    <string name="idea_morning_warmup">Ранкова розминка</string>
+    <string name="idea_early_wakeup">Ранній підйом</string>
+    <string name="idea_water_morning">Склянка води вранці</string>
+    <string name="idea_read_bed">Читати книгу в ліжку 15 хвилин</string>
+    <string name="idea_contrast_shower">Холодний і гарячий душ</string>
+    <string name="idea_new_breakfast">Сніданок за новим рецептом</string>
+    <string name="idea_plan_day">Планувати свій день</string>
+    
+    <string name="category_self_development">Саморозвиток</string>
+    <string name="category_self_development_desc">Читання, медитація та інше...</string>
+    <string name="idea_read_30m">Читати книгу 30 хвилин</string>
+    <string name="idea_listen_podcast">Послухати 1 подкаст</string>
+    <string name="idea_learn_words">Вивчити 10 іноземних слів</string>
+    <string name="idea_watch_lesson">Переглянути 1 урок онлайн</string>
+    <string name="idea_meditation">Медитація</string>
+    <string name="idea_yoga">Йога</string>
+    <string name="idea_plan_tasks">Планувати завдання</string>
+    <string name="idea_play_chess">Грати в шахи</string>
+    <string name="idea_watch_movie">Переглянути фільм</string>
+    
+    <string name="category_family">Сім\'я</string>
+    <string name="category_family_desc">Батьки, діти, танець та інше...</string>
+    <string name="idea_family_dinner">Вечеря з сім\'єю</string>
+    <string name="idea_call_parents">Зателефонувати батькам</string>
+    <string name="idea_play_kids">Гра з дітьми</string>
+    <string name="idea_family_walk">Спільна прогулянка</string>
+    <string name="idea_share_success">Ділитись успіхами дня</string>
 </resources>

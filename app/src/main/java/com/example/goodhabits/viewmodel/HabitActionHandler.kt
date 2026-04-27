@@ -23,7 +23,8 @@ internal class HabitActionHandler(
     private val draftStateHolder: HabitDraftStateHolder,
     private val screenStateHolder: HabitScreenStateHolder,
     private val analysisEngine: BehavioralAnalysisEngine,
-    private val reminderScheduler: ReminderScheduler
+    private val reminderScheduler: ReminderScheduler,
+    private val scope: CoroutineScope
 ) {
     suspend fun addHabit() {
         screenStateHolder.setLoading(true)
@@ -104,7 +105,7 @@ internal class HabitActionHandler(
     }
 
     private fun checkHabitStacking(completedHabitId: Int) {
-        CoroutineScope(Dispatchers.IO).launch {
+        scope.launch(Dispatchers.IO) {
             val chains = analysisEngine.findHabitChains()
             val chain = chains.find { it.firstHabitId == completedHabitId }
             

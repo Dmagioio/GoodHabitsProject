@@ -7,12 +7,25 @@ import com.example.goodhabits.domain.model.HabitCompletionHistory
 import javax.inject.Inject
 
 class HabitMapper @Inject constructor() {
+    private fun mapDayToInternal(day: String): String {
+        return when (day) {
+            "Нд" -> "SU"
+            "Пн" -> "MO"
+            "Вт" -> "TU"
+            "Ср" -> "WE"
+            "Чт" -> "TH"
+            "Пт" -> "FR"
+            "Сб" -> "SA"
+            else -> day // Already internal or unknown
+        }
+    }
+
     fun toDomain(entity: HabitEntity): Habit = Habit(
         id = entity.id,
         title = entity.title,
         colorHex = entity.colorHex,
         completedDates = entity.completedDates,
-        days = entity.days,
+        days = entity.days.map { mapDayToInternal(it) }.toSet(),
         reminderTime = entity.reminderTime,
         motivation = entity.motivation
     )
@@ -22,7 +35,7 @@ class HabitMapper @Inject constructor() {
         title = domain.title,
         colorHex = domain.colorHex,
         completedDates = domain.completedDates,
-        days = domain.days,
+        days = domain.days, // Save as internal "MO", "TU", etc.
         reminderTime = domain.reminderTime,
         motivation = domain.motivation
     )

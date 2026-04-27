@@ -39,7 +39,8 @@ class HabitViewModel @Inject constructor(
         draftStateHolder = draftStateHolder,
         screenStateHolder = screenStateHolder,
         analysisEngine = analysisEngine,
-        reminderScheduler = reminderScheduler
+        reminderScheduler = reminderScheduler,
+        scope = viewModelScope
     )
 
     val draftTitle: StateFlow<String> = draftStateHolder.draftTitle

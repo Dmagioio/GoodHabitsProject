@@ -24,9 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.domain.model.calculateStreak
-import java.text.SimpleDateFormat
+import com.example.goodhabits.ui.theme.StreakOrange
 import java.time.LocalDate
-import java.util.Calendar
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
@@ -70,7 +70,7 @@ fun WeeklyHabitCard(
                         text = "🔥 $streak",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                            color = Color(0xFFFF9800)
+                            color = StreakOrange
                         )
                     )
                 }
@@ -97,14 +97,9 @@ fun WeekDatesRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        val dayFormatter = DateTimeFormatter.ofPattern("EE", Locale.getDefault())
         dates.forEach { date ->
-            val cal = Calendar.getInstance().apply {
-                set(Calendar.YEAR, date.year)
-                set(Calendar.MONTH, date.monthValue - 1)
-                set(Calendar.DAY_OF_MONTH, date.dayOfMonth)
-            }
-            val dayFormatter = SimpleDateFormat("E", Locale("uk"))
-            val dayName = dayFormatter.format(cal.time)
+            val dayName = date.format(dayFormatter).replaceFirstChar { it.uppercase() }
             val key = date.toEpochDay()
             val isSelected = habit.completedDates.contains(key)
             Column(

@@ -32,7 +32,7 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override val language: Flow<AppLanguage> = context.dataStore.data.map { preferences ->
-        val langName = preferences[PreferencesKeys.LANGUAGE] ?: AppLanguage.UK.name
+        val langName = preferences[PreferencesKeys.LANGUAGE] ?: AppLanguage.SYSTEM.name
         AppLanguage.valueOf(langName)
     }
 

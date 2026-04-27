@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.domain.model.calculateStreak
+import com.example.goodhabits.ui.theme.StreakOrange
 import java.time.LocalDate
 
 @Composable
@@ -66,7 +67,7 @@ fun OverallHabitCard(
                         text = "🔥 $streak",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFFFF9800)
+                            color = StreakOrange
                         ),
                         modifier = Modifier.padding(end = 8.dp)
                     )
