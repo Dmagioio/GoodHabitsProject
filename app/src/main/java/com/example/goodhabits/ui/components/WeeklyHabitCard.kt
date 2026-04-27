@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.goodhabits.domain.model.Habit
+import com.example.goodhabits.domain.model.calculateStreak
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Calendar
@@ -36,6 +37,7 @@ fun WeeklyHabitCard(
 ) {
     val today = LocalDate.now()
     val dates = (6 downTo 0).map { today.minusDays(it.toLong()) }
+    val streak = habit.calculateStreak()
 
     val habitColor = Color(habit.colorHex.toInt())
 
@@ -53,10 +55,26 @@ fun WeeklyHabitCard(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = habit.title,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = habit.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                if (streak > 0) {
+                    Text(
+                        text = "🔥 $streak",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                            color = Color(0xFFFF9800)
+                        )
+                    )
+                }
+            }
 
             WeekDatesRow(
                 dates = dates,

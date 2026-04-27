@@ -21,8 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.goodhabits.domain.model.Habit
+import com.example.goodhabits.domain.model.calculateStreak
 import java.time.LocalDate
 
 @Composable
@@ -34,6 +36,7 @@ fun OverallHabitCard(
     val todayKey = LocalDate.now().toEpochDay()
     val isCompletedToday = habit.completedDates.contains(todayKey)
     val habitColor = Color(habit.colorHex.toInt())
+    val streak = habit.calculateStreak()
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -57,6 +60,18 @@ fun OverallHabitCard(
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleMedium
                 )
+                
+                if (streak > 0) {
+                    Text(
+                        text = "🔥 $streak",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFFF9800)
+                        ),
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+
                 Checkbox(
                     checked = isCompletedToday,
                     onCheckedChange = { onToggleToday() },

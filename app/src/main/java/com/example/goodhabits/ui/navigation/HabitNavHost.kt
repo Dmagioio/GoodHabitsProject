@@ -78,6 +78,7 @@ fun HabitNavHost(
         composable(Screen.Main.route) {
             MainScreen(
                 habits = state.habits,
+                isLoading = state.isLoading,
                 currentStreak = state.currentStreak,
                 timeSuggestions = state.timeSuggestions,
                 dismissedSuggestions = state.dismissedSuggestions,

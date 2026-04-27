@@ -25,6 +25,7 @@ import java.time.LocalDate
 @Composable
 fun DailyScreen(
     habits: List<Habit>,
+    isLoading: Boolean = false,
     timeSuggestions: Map<Int, TimeAdaptationSuggestion> = emptyMap(),
     onToggleHabitToday: (Habit) -> Unit,
     onHabitClick: (Habit) -> Unit
@@ -49,7 +50,16 @@ fun DailyScreen(
         DateHeader()
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (habits.isEmpty()) {
+        if (isLoading) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(5) {
+                    com.example.goodhabits.ui.components.HabitCardSkeleton()
+                }
+            }
+        } else if (habits.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center

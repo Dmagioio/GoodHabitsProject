@@ -51,6 +51,7 @@ class HabitViewModel @Inject constructor(
     val uiState: StateFlow<HabitUiState> = screenStateHolder.uiState
 
     init {
+        screenStateHolder.setLoading(true)
         viewModelScope.launch {
             observeHabitsUseCase().collect { list ->
                 screenStateHolder.updateHabits(list)

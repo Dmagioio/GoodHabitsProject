@@ -62,6 +62,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.goodhabits.domain.analysis.TimeAdaptationSuggestion
+import com.example.goodhabits.ui.theme.SurfaceLevel2
 
 enum class TabScreen(val titleRes: Int) {
     Daily(R.string.daily_tab),
@@ -130,6 +131,7 @@ fun StreakCard(streak: Int) {
 @Composable
 fun MainScreen(
     habits: List<Habit>,
+    isLoading: Boolean = false,
     currentStreak: Int = 0,
     timeSuggestions: Map<Int, TimeAdaptationSuggestion> = emptyMap(),
     dismissedSuggestions: Set<Int> = emptySet(),
@@ -323,7 +325,14 @@ fun MainScreen(
                     .padding(innerPadding)
                     .fillMaxSize()
             ) {
-                if (habits.isEmpty()) {
+                if (isLoading) {
+                    DailyScreen(
+                        habits = emptyList(),
+                        isLoading = true,
+                        onToggleHabitToday = {},
+                        onHabitClick = {}
+                    )
+                } else if (habits.isEmpty()) {
                     EmptyHabitsContent(
                         onCreateClick = onOpenAddHabit,
                         onIdeasClick = onOpenIdeas
@@ -347,35 +356,33 @@ fun MainScreen(
                                 selected = selected,
                                 onClick = { selectedTabIndex = index },
                                 selectedContentColor = Color.White,
-                                unselectedContentColor = Color.DarkGray,
+                                unselectedContentColor = SurfaceLevel2,
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(10.dp))
+                                    .clip(RoundedCornerShape(8.dp))
                                     .background(if (selected) Purple else Color.Transparent)
+                                    .height(36.dp)
                             ) {
-                                Box(
-                                    modifier = Modifier.padding(vertical = 10.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = stringResource(screen.titleRes),
-                                        style = MaterialTheme.typography.labelLarge,
-                                        modifier = Modifier.zIndex(1f)
-                                    )
-                                }
+                                Text(
+                                    text = stringResource(screen.titleRes),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                                )
                             }
                         }
                     }
+
                     Crossfade(
-                        targetState = selectedTabIndex,
-                        label = "TabContentCrossfade"
-                    ) { targetIndex ->
-                        when (TabScreen.entries[targetIndex]) {
+                        targetState = TabScreen.entries[selectedTabIndex],
+                        label = "tab_fade",
+                        modifier = Modifier.weight(1f)
+                    ) { screen ->
+                        when (screen) {
                             TabScreen.Daily -> DailyScreen(
                                 habits = habits,
+                                isLoading = false,
                                 timeSuggestions = timeSuggestions,
-                                onToggleHabitToday = { habit ->
-                                    onToggleHabitToday(habit.id)
-                                },
+                                onToggleHabitToday = { onToggleHabitToday(it.id) },
                                 onHabitClick = onHabitClick
                             )
 

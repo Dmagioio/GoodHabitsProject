@@ -1,5 +1,6 @@
 package com.example.goodhabits.domain.model
 
+import java.time.LocalDate
 import java.time.LocalTime
 
 data class Habit(
@@ -11,3 +12,36 @@ data class Habit(
     val reminderTime: LocalTime? = null,
     val motivation: String = ""
 )
+
+fun Habit.calculateStreak(): Int {
+    if (completedDates.isEmpty()) return 0
+    
+    val today = LocalDate.now()
+    val sortedDates = completedDates
+        .map { LocalDate.ofEpochDay(it) }
+        .filter { !it.isAfter(today) }
+        .sortedDescending()
+
+    if (sortedDates.isEmpty()) return 0
+
+    var streak = 0
+    var currentDate = today
+    
+    // If not completed today, check if it was completed yesterday to continue streak
+    if (sortedDates.first() != today) {
+        currentDate = today.minusDays(1)
+        if (sortedDates.first() != currentDate) {
+            return 0
+        }
+    }
+
+    for (date in sortedDates) {
+        if (date == currentDate) {
+            streak++
+            currentDate = currentDate.minusDays(1)
+        } else if (date.isBefore(currentDate)) {
+            break
+        }
+    }
+    return streak
+}

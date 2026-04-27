@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.goodhabits.domain.analysis.TimeAdaptationSuggestion
 import com.example.goodhabits.domain.model.Habit
+import com.example.goodhabits.domain.model.calculateStreak
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -27,6 +28,7 @@ fun HabitCard(
 ) {
     val cardColor = Color(habit.colorHex.toInt())
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+    val streak = habit.calculateStreak()
 
     Card(
         modifier = Modifier
@@ -42,11 +44,26 @@ fun HabitCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = habit.title,
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = habit.title,
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    
+                    if (streak > 0) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "🔥 $streak",
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFFF9800) // Orange color for the streak
+                            )
+                        )
+                    }
+                }
                 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
