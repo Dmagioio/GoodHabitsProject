@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.goodhabits.R
 import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.components.WeeklyHabitCard
 import java.time.LocalDate
@@ -31,7 +33,7 @@ fun WeeklyScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Ще немає звичок для відстеження за тиждень",
+                text = stringResource(R.string.empty_weekly_habits_msg),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )

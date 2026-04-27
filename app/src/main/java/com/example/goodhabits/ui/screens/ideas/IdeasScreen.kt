@@ -8,10 +8,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,6 +39,11 @@ fun IdeasScreen(
     viewModel: IdeasViewModel = hiltViewModel()
 ) {
     val categories by viewModel.categories.collectAsState()
+    
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    LaunchedEffect(configuration) {
+        viewModel.loadCategories()
+    }
 
     Scaffold(
         topBar = {
@@ -92,14 +100,20 @@ fun IdeasScreen(
             }
 
             items(categories) { category ->
-                CategoryItem(category = category, onClick = { onCategoryClick(category.id) })
+                CategoryCard(
+                    category = category,
+                    onClick = { onCategoryClick(category.id) }
+                )
             }
         }
     }
 }
 
 @Composable
-fun CategoryItem(category: IdeaCategory, onClick: () -> Unit) {
+fun CategoryCard(
+    category: IdeaCategory,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -113,7 +127,7 @@ fun CategoryItem(category: IdeaCategory, onClick: () -> Unit) {
                 Icon(category.icon, contentDescription = null, tint = Purple)
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = category.title,
+                    text = stringResource(category.titleRes),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.weight(1f)
@@ -122,7 +136,7 @@ fun CategoryItem(category: IdeaCategory, onClick: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = category.description,
+                text = stringResource(category.descriptionRes),
                 color = Color.Gray,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(start = 40.dp)
@@ -131,7 +145,6 @@ fun CategoryItem(category: IdeaCategory, onClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IdeaCategoryDetailScreen(
     categoryId: String,
@@ -139,65 +152,66 @@ fun IdeaCategoryDetailScreen(
     onIdeaClick: (String) -> Unit,
     viewModel: IdeasViewModel = hiltViewModel()
 ) {
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    LaunchedEffect(configuration) {
+        viewModel.loadCategories()
+    }
+
     val category = viewModel.getCategoryById(categoryId) ?: return
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.ideas)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-                    }
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF7F7F7))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(category.titleRes),
+                style = MaterialTheme.typography.titleLarge
             )
         }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .background(Color(0xFFF7F7F7))
-                .padding(16.dp)
-        ) {
-            Text(
-                text = category.title,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-            ) {
-                Column {
-                    category.ideas.forEachIndexed { index, idea ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onIdeaClick(idea) }
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(category.ideasRes) { ideaResId ->
+                val ideaText = stringResource(ideaResId)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = ideaText,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(
+                            onClick = { onIdeaClick(ideaText) }
                         ) {
-                            Text(
-                                text = idea,
-                                fontSize = 16.sp,
-                                modifier = Modifier.weight(1f)
-                            )
                             Icon(
-                                Icons.Default.ChevronRight,
-                                contentDescription = null,
-                                tint = Color.LightGray,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                        if (index < category.ideas.size - 1) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                color = Color(0xFFF0F0F0)
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add Habit",
+                                tint = Purple
                             )
                         }
                     }

@@ -67,6 +67,8 @@
     <string name="streak_label_all">Загальний стрік</string>
     <string name="streak_start_msg">Почни новий стрік, виконуючи звички</string>
     <string name="empty_daily_habits_msg">Натисніть +, щоб додати першу звичку</string>
+    <string name="empty_weekly_habits_msg">Ще немає звичок для відстеження за тиждень</string>
+    <string name="empty_overall_habits_msg">Додайте звичку, щоб побачити загальну статистику</string>
     <string name="usually_at"> -> зазвичай о %s</string>
     <string name="day_su">Нд</string>
     <string name="day_mo">Пн</string>
@@ -106,4 +108,24 @@
     <string name="idea_play_kids">Гра з дітьми</string>
     <string name="idea_family_walk">Спільна прогулянка</string>
     <string name="idea_share_success">Ділитись успіхами дня</string>
+    
+    <string name="category_food">Їжа</string>
+    <string name="category_food_desc">Фрукти, трави, щоденник...</string>
+    <string name="idea_food_diary">Вести щоденник калорій</string>
+    <string name="idea_no_sweets">День без солодкого</string>
+    <string name="idea_no_alcohol">День без алкоголю</string>
+    <string name="idea_no_coffee">День без кави</string>
+    <string name="idea_new_recipe">Новий рецепт кожен день</string>
+    <string name="idea_fresh_fruits">Їсти свіжі фрукти</string>
+    
+    <string name="category_self_care">Самопіклування</string>
+    <string name="category_self_care_desc">Сон, масаж, мрії...</string>
+    <string name="idea_no_phone_before_bed">Година перед сном без телефону</string>
+    <string name="idea_sleep_8h">Спати принаймні 8 годин</string>
+    <string name="idea_sleep_before_midnight">Лягати спати до півночі</string>
+    <string name="idea_no_nicotine">День без нікотину</string>
+    <string name="idea_massage">Масаж</string>
+    <string name="idea_walk_before_bed">Прогулянка перед сном</string>
+    <string name="idea_pool">Басейн</string>
+    <string name="idea_stay_home">Залишатися вдома</string>
 </resources>

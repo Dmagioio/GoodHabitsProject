@@ -28,7 +28,6 @@ class HabitLocalDataSource @Inject constructor(
 
     suspend fun deleteHabitById(id: Int) = habitDao.deleteHabitById(id)
 
-    // History methods
     suspend fun insertHistory(history: HabitCompletionHistoryEntity) = historyDao.insertHistory(history)
 
     fun getHistoryForHabit(habitId: Int): Flow<List<HabitCompletionHistoryEntity>> = historyDao.getHistoryForHabit(habitId)

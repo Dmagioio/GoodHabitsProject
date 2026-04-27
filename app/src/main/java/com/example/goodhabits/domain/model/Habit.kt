@@ -27,7 +27,6 @@ fun Habit.calculateStreak(): Int {
     var streak = 0
     var currentDate = today
     
-    // If not completed today, check if it was completed yesterday to continue streak
     if (sortedDates.first() != today) {
         currentDate = today.minusDays(1)
         if (sortedDates.first() != currentDate) {

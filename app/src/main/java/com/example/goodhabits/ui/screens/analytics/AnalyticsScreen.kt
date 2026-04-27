@@ -193,8 +193,9 @@ fun AnalyticsScreen(
                         IconButton(onClick = { viewModel.previousMonth() }) {
                             Icon(Icons.Default.ChevronLeft, contentDescription = null, tint = accentColor)
                         }
+                        val configuration = androidx.compose.ui.platform.LocalConfiguration.current
                         Text(
-                            text = "${uiState.currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }} ${uiState.currentMonth.year}",
+                            text = "${uiState.currentMonth.month.getDisplayName(TextStyle.FULL, configuration.locales[0]).replaceFirstChar { if (it.isLowerCase()) it.titlecase(configuration.locales[0]) else it.toString() }} ${uiState.currentMonth.year}",
                             fontWeight = FontWeight.Medium
                         )
                         IconButton(onClick = { viewModel.nextMonth() }) {
@@ -229,7 +230,7 @@ fun AnalyticsScreen(
 
                     val firstDayOfMonth = uiState.currentMonth.atDay(1)
                     val daysInMonth = uiState.currentMonth.lengthOfMonth()
-                    val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7 // 0 for Sunday
+                    val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
 
                     var currentDay = 1
                     for (row in 0..5) {

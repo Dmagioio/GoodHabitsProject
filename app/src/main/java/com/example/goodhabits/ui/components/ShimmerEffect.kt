@@ -83,7 +83,6 @@ fun HabitCardSkeleton() {
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
             ) {
-                // Title skeleton
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.6f)
@@ -94,7 +93,6 @@ fun HabitCardSkeleton() {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Time skeleton
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
@@ -113,7 +111,6 @@ fun HabitCardSkeleton() {
                 }
             }
 
-            // Checkmark skeleton
             Box(
                 modifier = Modifier
                     .size(24.dp)

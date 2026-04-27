@@ -44,10 +44,7 @@ class HabitRepositoryImpl @Inject constructor(
         val isCompleting = updatedDates.add(key)
         if (!isCompleting) {
             updatedDates.remove(key)
-            // If we are un-completing, we might want to handle history, 
-            // but for simplicity we'll just insert on completion.
         } else {
-            // Log history
             localDataSource.insertHistory(
                 HabitCompletionHistoryEntity(
                     habitId = id,

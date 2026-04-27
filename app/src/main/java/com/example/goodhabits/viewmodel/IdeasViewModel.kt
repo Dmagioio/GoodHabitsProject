@@ -1,17 +1,23 @@
 package com.example.goodhabits.viewmodel
 
+import android.app.Application
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.goodhabits.R
 import com.example.goodhabits.domain.model.IdeaCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class IdeasViewModel @Inject constructor() : ViewModel() {
+class IdeasViewModel @Inject constructor(
+    application: Application
+) : AndroidViewModel(application) {
 
     private val _categories = MutableStateFlow<List<IdeaCategory>>(emptyList())
     val categories: StateFlow<List<IdeaCategory>> = _categories.asStateFlow()
@@ -20,81 +26,81 @@ class IdeasViewModel @Inject constructor() : ViewModel() {
         loadCategories()
     }
 
-    private fun loadCategories() {
+    fun loadCategories() {
         _categories.value = listOf(
             IdeaCategory(
                 id = "food",
-                title = "Їжа",
+                titleRes = R.string.category_food,
                 icon = Icons.Default.Eco,
-                description = "Фрукти, трави, щоденник...",
-                ideas = listOf(
-                    "Вести щоденник калорій",
-                    "День без солодкого",
-                    "День без алкоголю",
-                    "День без кави",
-                    "Новий рецепт кожен день",
-                    "Їсти свіжі фрукти"
+                descriptionRes = R.string.category_food_desc,
+                ideasRes = listOf(
+                    R.string.idea_food_diary,
+                    R.string.idea_no_sweets,
+                    R.string.idea_no_alcohol,
+                    R.string.idea_no_coffee,
+                    R.string.idea_new_recipe,
+                    R.string.idea_fresh_fruits
                 )
             ),
             IdeaCategory(
                 id = "self_care",
-                title = "Самопіклування",
+                titleRes = R.string.category_self_care,
                 icon = Icons.Default.FavoriteBorder,
-                description = "Сон, масаж, мрії...",
-                ideas = listOf(
-                    "Година перед сном без телефону",
-                    "Спати принаймні 8 годин",
-                    "Лягати спати до півночі",
-                    "День без нікотину",
-                    "Масаж",
-                    "Прогулянка перед сном",
-                    "Басейн",
-                    "Залишатися вдома",
+                descriptionRes = R.string.category_self_care_desc,
+                ideasRes = listOf(
+                    R.string.idea_no_phone_before_bed,
+                    R.string.idea_sleep_8h,
+                    R.string.idea_sleep_before_midnight,
+                    R.string.idea_no_nicotine,
+                    R.string.idea_massage,
+                    R.string.idea_walk_before_bed,
+                    R.string.idea_pool,
+                    R.string.idea_stay_home
                 )
             ),
             IdeaCategory(
                 id = "perfect_morning",
-                title = "Ідеальний ранок",
+                titleRes = R.string.category_perfect_morning,
                 icon = Icons.Default.WbSunny,
-                description = "Сніданок, душ, вправи та інше...",
-                ideas = listOf(
-                    "Ранкова розминка",
-                    "Ранній підйом",
-                    "Склянка води вранці",
-                    "Читати книгу в ліжку 15 хвилин",
-                    "Холодний і гарячий душ",
-                    "Сніданок за новим рецептом",
-                    "Планувати свій день"
+                descriptionRes = R.string.category_perfect_morning_desc,
+                ideasRes = listOf(
+                    R.string.idea_morning_warmup,
+                    R.string.idea_early_wakeup,
+                    R.string.idea_water_morning,
+                    R.string.idea_read_bed,
+                    R.string.idea_contrast_shower,
+                    R.string.idea_new_breakfast,
+                    R.string.idea_plan_day
                 )
             ),
             IdeaCategory(
                 id = "self_development",
-                title = "Саморозвиток",
+                titleRes = R.string.category_self_development,
                 icon = Icons.Default.Casino,
-                description = "Читання, медитація та інше...",
-                ideas = listOf(
-                    "Читати книгу 30 хвилин",
-                    "Послухати 1 подкаст",
-                    "Вивчити 10 іноземних слів",
-                    "Переглянути 1 урок онлайн",
-                    "Медитація",
-                    "Йога",
-                    "Планувати завдання",
-                    "Грати в шахи",
-                    "Переглянути фільм"
+                descriptionRes = R.string.category_self_development_desc,
+                ideasRes = listOf(
+                    R.string.idea_read_30m,
+                    R.string.idea_listen_podcast,
+                    R.string.idea_learn_words,
+                    R.string.idea_watch_lesson,
+                    R.string.idea_meditation,
+                    R.string.idea_yoga,
+                    R.string.idea_plan_tasks,
+                    R.string.idea_play_chess,
+                    R.string.idea_watch_movie
                 )
             ),
             IdeaCategory(
                 id = "family",
-                title = "Сім'я",
+                titleRes = R.string.category_family,
                 icon = Icons.Default.SentimentSatisfied,
-                description = "Батьки, діти, танець та інше...",
-                ideas = listOf(
-                    "Вечеря з сім'єю",
-                    "Зателефонувати батькам",
-                    "Гра з дітьми",
-                    "Спільна прогулянка",
-                    "Ділитись успіхами дня"
+                descriptionRes = R.string.category_family_desc,
+                ideasRes = listOf(
+                    R.string.idea_family_dinner,
+                    R.string.idea_call_parents,
+                    R.string.idea_play_kids,
+                    R.string.idea_family_walk,
+                    R.string.idea_share_success
                 )
             )
         )

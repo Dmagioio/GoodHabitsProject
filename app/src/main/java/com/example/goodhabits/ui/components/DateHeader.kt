@@ -20,12 +20,14 @@ import java.util.Locale
 
 @Composable
 fun DateHeader() {
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    
     val today = remember { LocalDate.now() }
-    val dayFormatter = remember(Locale.getDefault()) { DateTimeFormatter.ofPattern("EEEE", Locale.getDefault()) }
-    val dateFormatter = remember(Locale.getDefault()) { DateTimeFormatter.ofPattern("dd/MM/yy", Locale.getDefault()) }
+    val dayFormatter = remember(configuration.locales[0]) { DateTimeFormatter.ofPattern("EEE", configuration.locales[0]) }
+    val dateFormatter = remember(configuration.locales[0]) { DateTimeFormatter.ofPattern("dd/MM/yy", configuration.locales[0]) }
 
     val dayName = today.format(dayFormatter)
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(configuration.locales[0]) else it.toString() }
     val dateText = today.format(dateFormatter)
 
     Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {

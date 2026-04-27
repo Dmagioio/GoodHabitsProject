@@ -16,7 +16,7 @@ class HabitMapper @Inject constructor() {
             "Чт" -> "TH"
             "Пт" -> "FR"
             "Сб" -> "SA"
-            else -> day // Already internal or unknown
+            else -> day
         }
     }
 
@@ -35,7 +35,7 @@ class HabitMapper @Inject constructor() {
         title = domain.title,
         colorHex = domain.colorHex,
         completedDates = domain.completedDates,
-        days = domain.days, // Save as internal "MO", "TU", etc.
+        days = domain.days,
         reminderTime = domain.reminderTime,
         motivation = domain.motivation
     )

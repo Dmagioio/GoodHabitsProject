@@ -67,6 +67,8 @@
     <string name="streak_label_all">Streak all</string>
     <string name="streak_start_msg">Start a new streak by completing habits</string>
     <string name="empty_daily_habits_msg">Tap + to add your first habit</string>
+    <string name="empty_weekly_habits_msg">No habits to track for the week yet</string>
+    <string name="empty_overall_habits_msg">Add a habit to see overall statistics</string>
     <string name="usually_at"> -> usually at %s</string>
     <string name="day_su">Su</string>
     <string name="day_mo">Mo</string>
@@ -106,4 +108,24 @@
     <string name="idea_play_kids">Play with kids</string>
     <string name="idea_family_walk">Walk together</string>
     <string name="idea_share_success">Share the successes of the day</string>
+    
+    <string name="category_food">Food</string>
+    <string name="category_food_desc">Fruits, herbs, diary...</string>
+    <string name="idea_food_diary">Keep a calorie diary</string>
+    <string name="idea_no_sweets">Day without sweets</string>
+    <string name="idea_no_alcohol">Day without alcohol</string>
+    <string name="idea_no_coffee">Day without coffee</string>
+    <string name="idea_new_recipe">New recipe every day</string>
+    <string name="idea_fresh_fruits">Eat fresh fruits</string>
+    
+    <string name="category_self_care">Self-care</string>
+    <string name="category_self_care_desc">Sleep, massage, dreams...</string>
+    <string name="idea_no_phone_before_bed">An hour without a phone before bed</string>
+    <string name="idea_sleep_8h">Sleep at least 8 hours</string>
+    <string name="idea_sleep_before_midnight">Go to bed before midnight</string>
+    <string name="idea_no_nicotine">Day without nicotine</string>
+    <string name="idea_massage">Massage</string>
+    <string name="idea_walk_before_bed">Walk before bed</string>
+    <string name="idea_pool">Pool</string>
+    <string name="idea_stay_home">Stay at home</string>
 </resources>

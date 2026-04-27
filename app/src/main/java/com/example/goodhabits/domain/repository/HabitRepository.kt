@@ -22,7 +22,6 @@ interface HabitRepository {
 
     suspend fun deleteAllHabits()
 
-    // History methods
     fun observeAllHistory(): Flow<List<HabitCompletionHistory>>
     suspend fun getLastHistoryRecords(habitId: Int, limit: Int): List<HabitCompletionHistory>
 }

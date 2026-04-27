@@ -21,7 +21,7 @@ enum class AnalyticsPeriod {
 
 data class AnalyticsUiState(
     val habits: List<Habit> = emptyList(),
-    val selectedHabitId: Int? = null, // null means "All habits"
+    val selectedHabitId: Int? = null,
     val period: AnalyticsPeriod = AnalyticsPeriod.Weekly,
     val currentMonth: YearMonth = YearMonth.now()
 ) {

@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.example.goodhabits.R
 import com.example.goodhabits.domain.model.Habit
 import com.example.goodhabits.ui.components.OverallHabitCard
 @Composable
@@ -29,7 +31,7 @@ fun OverallScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Додайте звичку, щоб побачити загальну статистику",
+                text = stringResource(R.string.empty_overall_habits_msg),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )

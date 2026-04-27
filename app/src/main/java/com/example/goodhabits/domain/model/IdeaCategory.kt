@@ -1,11 +1,12 @@
 package com.example.goodhabits.domain.model
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 
 data class IdeaCategory(
     val id: String,
-    val title: String,
+    @StringRes val titleRes: Int,
     val icon: ImageVector,
-    val description: String,
-    val ideas: List<String>
+    @StringRes val descriptionRes: Int,
+    @StringRes val ideasRes: List<Int>
 )

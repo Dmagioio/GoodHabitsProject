@@ -42,7 +42,6 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             val currentConfig = LocalConfiguration.current
             
-            // Generate configuration based on the language
             val config = remember(language) {
                 val locale = when (language) {
                     AppLanguage.EN -> Locale("en")

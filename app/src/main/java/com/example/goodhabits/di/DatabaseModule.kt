@@ -24,7 +24,7 @@ object DatabaseModule {
         HabitDatabase::class.java,
         "good_habits.db"
     )
-    .fallbackToDestructiveMigration() // Added to handle database version changes for simplicity in development
+    .fallbackToDestructiveMigration()
     .build()
 
     @Provides

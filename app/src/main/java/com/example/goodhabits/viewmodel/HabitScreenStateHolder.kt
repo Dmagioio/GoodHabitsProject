@@ -45,10 +45,8 @@ internal class HabitScreenStateHolder(
         var streak = 0
         var currentDate = today
         
-        // If nothing completed today, start checking from yesterday
         if (allCompletedDates.first() != currentDate) {
             currentDate = currentDate.minusDays(1)
-            // If also nothing completed yesterday, streak is 0
             if (allCompletedDates.first() != currentDate) {
                 return 0
             }
@@ -59,7 +57,6 @@ internal class HabitScreenStateHolder(
                 streak++
                 currentDate = currentDate.minusDays(1)
             } else if (date.isBefore(currentDate)) {
-                // Gap found
                 break
             }
         }

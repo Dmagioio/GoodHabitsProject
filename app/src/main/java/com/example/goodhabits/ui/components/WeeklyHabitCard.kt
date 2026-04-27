@@ -91,15 +91,16 @@ fun WeekDatesRow(
     habit: Habit,
     onToggleForDate: (LocalDate) -> Unit
 ) {
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
     val habitColor = Color(habit.colorHex.toInt())
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        val dayFormatter = DateTimeFormatter.ofPattern("EE", Locale.getDefault())
+        val dayFormatter = DateTimeFormatter.ofPattern("EE", configuration.locales[0])
         dates.forEach { date ->
-            val dayName = date.format(dayFormatter).replaceFirstChar { it.uppercase() }
+            val dayName = date.format(dayFormatter).replaceFirstChar { it.titlecase(configuration.locales[0]) }
             val key = date.toEpochDay()
             val isSelected = habit.completedDates.contains(key)
             Column(
