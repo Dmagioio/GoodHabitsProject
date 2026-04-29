@@ -135,7 +135,7 @@ fun AnalyticsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = accentColor.copy(alpha = if (androidx.compose.foundation.isSystemInDarkTheme()) 0.25f else 0.12f)
+                        containerColor = accentColor.copy(alpha = if (androidx.compose.foundation.isSystemInDarkTheme()) 0.70f else 0.67f)
                     )
                 ) {
                     Row(

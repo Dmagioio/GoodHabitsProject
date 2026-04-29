@@ -62,6 +62,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.goodhabits.domain.analysis.TimeAdaptationSuggestion
+import com.example.goodhabits.ui.theme.SurfaceLevel1
 import com.example.goodhabits.ui.theme.SurfaceLevel2
 
 enum class TabScreen(val titleRes: Int) {
