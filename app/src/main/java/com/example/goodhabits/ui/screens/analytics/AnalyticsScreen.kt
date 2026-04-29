@@ -134,7 +134,9 @@ fun AnalyticsScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = accentColor.copy(alpha = 0.1f))
+                    colors = CardDefaults.cardColors(
+                        containerColor = accentColor.copy(alpha = if (androidx.compose.foundation.isSystemInDarkTheme()) 0.25f else 0.12f)
+                    )
                 ) {
                     Row(
                         modifier = Modifier.padding(16.dp),
@@ -148,7 +150,9 @@ fun AnalyticsScreen(
                         Text(
                             text = stringResource(R.string.insight_weakest_day, dayName),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Black
+                            color = if (androidx.compose.foundation.isSystemInDarkTheme())
+                                Color.White
+                            else Color.Black
                         )
                     }
                 }
@@ -167,7 +171,7 @@ fun AnalyticsScreen(
                 )
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFFF0F0F0),
+                    color = MaterialTheme.colorScheme.surface,
                     onClick = { viewModel.togglePeriod() }
                 ) {
                     Row(
@@ -177,14 +181,16 @@ fun AnalyticsScreen(
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = if (uiState.period == AnalyticsPeriod.Weekly) 
                                 stringResource(R.string.weekly_label) 
                             else stringResource(R.string.monthly_label),
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -195,7 +201,7 @@ fun AnalyticsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
@@ -220,7 +226,7 @@ fun AnalyticsScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -299,7 +305,9 @@ fun AnalyticsScreen(
                                         }
                                         Text(
                                             text = "$currentDay",
-                                            color = if (successRate > 0.5f) Color.White else if (date == LocalDate.now()) accentColor else Color.Black,
+                                            color = if (successRate > 0.5f) Color.White 
+                                                   else if (date == LocalDate.now()) accentColor 
+                                                   else MaterialTheme.colorScheme.onSurface,
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                     }
@@ -327,7 +335,9 @@ fun InsightCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -387,7 +397,7 @@ fun WeeklySuccessChart(data: List<Pair<LocalDate, Float>>, accentColor: Color) {
                         .weight(1f)
                         .width(24.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFF5F5F5)),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.BottomCenter
                 ) {
                     Box(
@@ -424,7 +434,7 @@ fun MonthlyTrendChart(data: List<Pair<LocalDate, Float>>, accentColor: Color) {
                         .weight(1f)
                         .fillMaxHeight(success.coerceAtLeast(0.05f))
                         .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp))
-                        .background(if (success > 0) accentColor else Color(0xFFF5F5F5))
+                        .background(if (success > 0) accentColor else MaterialTheme.colorScheme.surfaceVariant)
                 )
             }
         }

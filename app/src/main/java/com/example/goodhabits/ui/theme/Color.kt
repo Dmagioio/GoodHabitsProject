@@ -12,8 +12,10 @@ val Pink40 = Color(0xFF7D5260)
 val GreyBlue = Color(0xE1E4F3FF)
 
 val DeepBackground = Color(0xFF0F111A)
+val DarkPageBackground = Color(0xFF000000)
 val SurfaceLevel1 = Color(0xFF1E2230)
 val SurfaceLevel2 = Color(0xFF282D3D)
+val DarkGreySurface = Color(0xFF2C2C2E)
 
 val TextHeader = Color(0xFFE2E8F0)
 val TextSecondary = Color(0xFF94A3B8)

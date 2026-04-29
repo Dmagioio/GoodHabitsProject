@@ -29,7 +29,7 @@ fun DateCircle(
             .background(if (selected) color else Color.Transparent)
             .border(
                 width = 2.dp,
-                color = if (selected) color else Color.LightGray,
+                color = if (selected) color else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                 shape = CircleShape
             )
             .clickable { onClick() },
@@ -38,7 +38,11 @@ fun DateCircle(
         Text(
             text = number.toString(),
             style = MaterialTheme.typography.bodySmall,
-            color = if (selected) Color.White else Color.Black
+            color = if (selected) {
+                Color.White
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            }
         )
     }
 }

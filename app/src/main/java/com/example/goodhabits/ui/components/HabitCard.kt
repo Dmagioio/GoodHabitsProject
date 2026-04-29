@@ -38,7 +38,9 @@ fun HabitCard(
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = cardColor)
+        colors = CardDefaults.cardColors(
+            containerColor = cardColor
+        )
     ) {
         Row(
             modifier = Modifier
@@ -98,7 +100,7 @@ fun HabitCard(
                 colors = CheckboxDefaults.colors(
                     checkedColor = Color.White,
                     checkmarkColor = cardColor,
-                    uncheckedColor = Color.White
+                    uncheckedColor = Color.White.copy(alpha = 0.6f)
                 )
             )
         }

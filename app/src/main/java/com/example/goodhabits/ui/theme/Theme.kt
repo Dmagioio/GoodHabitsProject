@@ -20,9 +20,9 @@ private val DarkColorScheme = darkColorScheme(
     onPrimaryContainer = TextHeader,
     secondary = AccentGradientEnd,
     onSecondary = Color.White,
-    background = DeepBackground,
+    background = DarkPageBackground,
     onBackground = TextHeader,
-    surface = SurfaceLevel1,
+    surface = DarkGreySurface,
     onSurface = TextHeader,
     surfaceVariant = SurfaceLevel2,
     onSurfaceVariant = TextSecondary,
@@ -52,7 +52,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun GoodHabitsTheme(
     appTheme: AppTheme = AppTheme.SYSTEM,
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val darkTheme = when (appTheme) {

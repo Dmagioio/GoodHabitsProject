@@ -344,7 +344,11 @@ fun MainScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 10.dp, vertical = 8.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(color = GreyBlue)
+                            .background(
+                                if (androidx.compose.foundation.isSystemInDarkTheme())
+                                    SurfaceLevel2
+                                else GreyBlue
+                            )
                             .padding(4.dp),
                         containerColor = Color.Transparent,
                         indicator = { },
