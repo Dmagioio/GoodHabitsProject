@@ -32,11 +32,19 @@
     <string name="or_text">or</string>
     <string name="choose_from_ideas_btn">Choose from ideas</string>
     <string name="all_habits">All habits</string>
-    <string name="completed_habits_section">Completed habits</string>
-    <string name="total_completed_habits">Total completed habits</string>
-    <string name="weekly_label">Weekly</string>
-    <string name="monthly_label">Monthly</string>
-    <string name="habit_heatmap_title">Habit Heatmap</string>
+    <string name="completed_habits_section">Success Rate</string>
+    <string name="today">Today</string>
+    <string name="weekly_label">Week</string>
+    <string name="monthly_label">Month</string>
+    <string name="total_completed_habits">Total completions</string>
+    <string name="habit_heatmap_title">Activity</string>
+    <string name="success_rate">Success Rate</string>
+    <string name="best_day">Best Day</string>
+    <string name="total_progress">Total Deeds</string>
+    <string name="trend_up">↑ by %d%%</string>
+    <string name="trend_down">↓ by %d%%</string>
+    <string name="trend_stable">stable</string>
+    <string name="insight_weakest_day">Pay attention to %s, you usually skip habits on this day.</string>
     <string name="settings_title">Settings</string>
     <string name="general_section">GENERAL</string>
     <string name="rate_app">Write a review</string>
@@ -77,6 +85,15 @@
     <string name="day_th">Th</string>
     <string name="day_fr">Fr</string>
     <string name="day_sa">Sa</string>
+    
+    <!-- Day names for insights -->
+    <string name="day_monday_acc">Monday</string>
+    <string name="day_tuesday_acc">Tuesday</string>
+    <string name="day_wednesday_acc">Wednesday</string>
+    <string name="day_thursday_acc">Thursday</string>
+    <string name="day_friday_acc">Friday</string>
+    <string name="day_saturday_acc">Saturday</string>
+    <string name="day_sunday_acc">Sunday</string>
     
     <!-- Ideas Categories -->
     <string name="category_perfect_morning">Perfect morning</string>

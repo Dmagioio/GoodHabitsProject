@@ -32,11 +32,19 @@
     <string name="or_text">або</string>
     <string name="choose_from_ideas_btn">Вибрати з ідей</string>
     <string name="all_habits">Усі звички</string>
-    <string name="completed_habits_section">Завершені звички</string>
-    <string name="total_completed_habits">Всього завершених звичок</string>
-    <string name="weekly_label">Щотижня</string>
-    <string name="monthly_label">Щомісяця</string>
-    <string name="habit_heatmap_title">Теплова карта звичок</string>
+    <string name="completed_habits_section">Успішність</string>
+    <string name="today">Сьогодні</string>
+    <string name="weekly_label">Тиждень</string>
+    <string name="monthly_label">Місяць</string>
+    <string name="total_completed_habits">Усього виконано</string>
+    <string name="habit_heatmap_title">Активність</string>
+    <string name="success_rate">Темп успіху</string>
+    <string name="best_day">Найкращий день</string>
+    <string name="total_progress">Всього справ</string>
+    <string name="trend_up">↑ на %d%%</string>
+    <string name="trend_down">↓ на %d%%</string>
+    <string name="trend_stable">стабільно</string>
+    <string name="insight_weakest_day">Зверніть увагу на %s, зазвичай ви пропускаєте звички в цей день.</string>
     <string name="settings_title">Налаштування</string>
     <string name="general_section">ЗАГАЛЬНІ</string>
     <string name="rate_app">Написати відгук</string>
@@ -77,6 +85,15 @@
     <string name="day_th">Чт</string>
     <string name="day_fr">Пт</string>
     <string name="day_sa">Сб</string>
+    
+    <!-- Day names -->
+    <string name="day_monday_acc">понеділок</string>
+    <string name="day_tuesday_acc">вівторок</string>
+    <string name="day_wednesday_acc">середу</string>
+    <string name="day_thursday_acc">четвер</string>
+    <string name="day_friday_acc">п\'ятницю</string>
+    <string name="day_saturday_acc">суботу</string>
+    <string name="day_sunday_acc">неділю</string>
     
     <!-- Ideas Categories -->
     <string name="category_perfect_morning">Ідеальний ранок</string>

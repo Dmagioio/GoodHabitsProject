@@ -101,7 +101,7 @@ class BehavioralAnalysisEngine @Inject constructor(
                 val second = sortedDayHistory[i + 1]
                 
                 val delay = Duration.between(first.actualTime, second.actualTime).toMinutes()
-                if (delay in 1..15) { // If second habit is within 15 mins of first
+                if (delay in 1..15) {
                     val pair = first.habitId to second.habitId
                     pairCorrelations.getOrPut(pair) { mutableListOf() }.add(delay)
                 }
@@ -116,5 +116,49 @@ class BehavioralAnalysisEngine @Inject constructor(
                     averageDelayMinutes = delays.average().toLong()
                 )
             }
+    }
+
+    suspend fun analyzeWeakestDay(habitId: Int? = null): java.time.DayOfWeek? {
+        val habits = if (habitId != null) {
+            repository.getHabitById(habitId)?.let { listOf(it) } ?: emptyList()
+        } else {
+            repository.getHabits()
+        }
+
+        if (habits.isEmpty()) return null
+
+        val dayStats = java.time.DayOfWeek.values().associateWith { 0 to 0 }.toMutableMap()
+
+        val today = java.time.LocalDate.now()
+        val startDate = today.minusDays(28)
+
+        var curr = startDate
+        while (!curr.isAfter(today)) {
+            val dayOfWeek = curr.dayOfWeek
+            val internalDay = when (dayOfWeek) {
+                java.time.DayOfWeek.MONDAY -> "MO"
+                java.time.DayOfWeek.TUESDAY -> "TU"
+                java.time.DayOfWeek.WEDNESDAY -> "WE"
+                java.time.DayOfWeek.THURSDAY -> "TH"
+                java.time.DayOfWeek.FRIDAY -> "FR"
+                java.time.DayOfWeek.SATURDAY -> "SA"
+                java.time.DayOfWeek.SUNDAY -> "SU"
+            }
+
+            habits.forEach { habit ->
+                if (habit.days.contains(internalDay)) {
+                    val currentStats = dayStats[dayOfWeek]!!
+                    val isCompleted = habit.completedDates.contains(curr.toEpochDay())
+                    dayStats[dayOfWeek] = (currentStats.first + 1) to (currentStats.second + (if (isCompleted) 1 else 0))
+                }
+            }
+            curr = curr.plusDays(1)
+        }
+
+        return dayStats
+            .filter { it.value.first > 0 }
+            .mapValues { it.value.second.toFloat() / it.value.first }
+            .filter { it.value < 0.8f }
+            .minByOrNull { it.value }?.key
     }
 }

@@ -44,7 +44,7 @@ fun AnalyticsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val accentColor = remember(uiState.selectedHabitId, uiState.habits) {
         val selectedHabit = uiState.habits.find { it.id == uiState.selectedHabitId }
-        if (selectedHabit != null) Color(selectedHabit.colorHex) else Color(0xFF4DB6AC)
+        if (selectedHabit != null) Color(selectedHabit.colorHex) else Color(0xFF9C27B0)
     }
 
     Scaffold(
@@ -78,15 +78,8 @@ fun AnalyticsScreen(
                         enabled = true,
                         shape = RoundedCornerShape(12.dp),
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Color.White,
-                            selectedLabelColor = Color.Black
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            borderColor = Color.LightGray,
-                            selectedBorderColor = Color.Transparent,
-                            borderWidth = 1.dp,
-                            enabled = true,
-                            selected = false,
+                            selectedContainerColor = accentColor,
+                            selectedLabelColor = Color.White
                         )
                     )
                 }
@@ -96,12 +89,71 @@ fun AnalyticsScreen(
                         onClick = { viewModel.selectHabit(habit.id) },
                         label = { Text(habit.title) },
                         enabled = true,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = Color(habit.colorHex),
+                            selectedLabelColor = Color.White
+                        )
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                InsightCard(
+                    modifier = Modifier.weight(1f),
+                    title = stringResource(R.string.success_rate),
+                    value = "${(uiState.successRate * 100).toInt()}%",
+                    subtitle = formatTrend(uiState.trend),
+                    accentColor = accentColor
+                )
+                InsightCard(
+                    modifier = Modifier.weight(1f),
+                    title = stringResource(R.string.best_day),
+                    value = uiState.bestDayOfWeek?.getDisplayName(TextStyle.SHORT, Locale.getDefault()) ?: "-",
+                    subtitle = stringResource(R.string.habit_heatmap_title),
+                    accentColor = accentColor
+                )
+                InsightCard(
+                    modifier = Modifier.weight(1f),
+                    title = stringResource(R.string.total_progress),
+                    value = "${uiState.totalCompletions}",
+                    subtitle = stringResource(R.string.total_completed_habits),
+                    accentColor = accentColor
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            uiState.insightDayRes?.let { dayResId ->
+                val dayName = stringResource(dayResId)
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = accentColor.copy(alpha = 0.1f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "💡",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = stringResource(R.string.insight_weakest_day, dayName),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Black
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -147,23 +199,10 @@ fun AnalyticsScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
-                    Text(
-                        text = "${uiState.allCompletedDates.size}",
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.total_completed_habits),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
                     if (uiState.period == AnalyticsPeriod.Weekly) {
-                        WeeklyBarChart(viewModel.getCompletionsPerDayOfWeek(), accentColor)
+                        WeeklySuccessChart(uiState.weeklyData, accentColor)
                     } else {
-                        MonthlyBarChart(viewModel.getCompletionsPerDayOfMonth(), uiState.currentMonth, accentColor)
+                        MonthlyTrendChart(uiState.monthlyTrendData, accentColor)
                     }
                 }
             }
@@ -242,7 +281,7 @@ fun AnalyticsScreen(
                                     Spacer(modifier = Modifier.weight(1f))
                                 } else {
                                     val date = uiState.currentMonth.atDay(currentDay)
-                                    val isCompleted = uiState.allCompletedDates.contains(date.toEpochDay())
+                                    val successRate = uiState.heatmapData[date] ?: 0f
                                     
                                     Box(
                                         modifier = Modifier
@@ -250,17 +289,17 @@ fun AnalyticsScreen(
                                             .aspectRatio(1f),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        if (isCompleted) {
+                                        if (successRate > 0) {
                                             Box(
                                                 modifier = Modifier
                                                     .size(32.dp)
                                                     .clip(CircleShape)
-                                                    .background(accentColor)
+                                                    .background(accentColor.copy(alpha = (successRate * 0.8f + 0.2f).coerceIn(0.2f, 1f)))
                                             )
                                         }
                                         Text(
                                             text = "$currentDay",
-                                            color = if (isCompleted) Color.White else if (date == LocalDate.now()) accentColor else Color.Black,
+                                            color = if (successRate > 0.5f) Color.White else if (date == LocalDate.now()) accentColor else Color.Black,
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                     }
@@ -278,7 +317,59 @@ fun AnalyticsScreen(
 }
 
 @Composable
-fun WeeklyBarChart(completionsPerDay: Map<DayOfWeek, Int>, accentColor: Color) {
+fun InsightCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    value: String,
+    subtitle: String,
+    accentColor: Color
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = accentColor
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (subtitle.contains("↑")) Color(0xFF4CAF50) else if (subtitle.contains("↓")) Color(0xFFF44336) else Color.Gray,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+fun formatTrend(trend: Float): String {
+    val percent = (trend * 100).toInt()
+    return when {
+        percent > 0 -> stringResource(R.string.trend_up, percent)
+        percent < 0 -> stringResource(R.string.trend_down, -percent)
+        else -> stringResource(R.string.trend_stable)
+    }
+}
+
+@Composable
+fun WeeklySuccessChart(data: List<Pair<LocalDate, Float>>, accentColor: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -286,30 +377,7 @@ fun WeeklyBarChart(completionsPerDay: Map<DayOfWeek, Int>, accentColor: Color) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Bottom
     ) {
-        val days = listOf(
-            stringResource(R.string.day_mo),
-            stringResource(R.string.day_tu),
-            stringResource(R.string.day_we),
-            stringResource(R.string.day_th),
-            stringResource(R.string.day_fr),
-            stringResource(R.string.day_sa),
-            stringResource(R.string.day_su)
-        )
-        val maxCompletions = completionsPerDay.values.maxOrNull() ?: 1
-
-        days.forEachIndexed { index, day ->
-            val dayOfWeek = when(index) {
-                0 -> DayOfWeek.MONDAY
-                1 -> DayOfWeek.TUESDAY
-                2 -> DayOfWeek.WEDNESDAY
-                3 -> DayOfWeek.THURSDAY
-                4 -> DayOfWeek.FRIDAY
-                5 -> DayOfWeek.SATURDAY
-                else -> DayOfWeek.SUNDAY
-            }
-            val count = completionsPerDay[dayOfWeek] ?: 0
-            val progress = count.toFloat() / maxCompletions.coerceAtLeast(1)
-
+        data.forEach { (date, success) ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.weight(1f)
@@ -317,39 +385,31 @@ fun WeeklyBarChart(completionsPerDay: Map<DayOfWeek, Int>, accentColor: Color) {
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .width(30.dp)
-                        .clip(RoundedCornerShape(15.dp))
+                        .width(24.dp)
+                        .clip(RoundedCornerShape(12.dp))
                         .background(Color(0xFFF5F5F5)),
                     contentAlignment = Alignment.BottomCenter
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(progress)
-                            .clip(RoundedCornerShape(15.dp))
-                            .background(if (count > 0) accentColor else Color.Transparent)
+                            .fillMaxHeight(success.coerceAtLeast(0.05f))
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (success > 0) accentColor else Color.Transparent)
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(day, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
-        }
-        
-        Column(
-            modifier = Modifier.height(150.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("$maxCompletions", style = MaterialTheme.typography.bodySmall)
-            Text("0", style = MaterialTheme.typography.bodySmall)
         }
     }
 }
 
 @Composable
-fun MonthlyBarChart(completionsPerDay: Map<Int, Int>, currentMonth: YearMonth, accentColor: Color) {
-    val daysInMonth = currentMonth.lengthOfMonth()
-    val maxCompletions = completionsPerDay.values.maxOrNull() ?: 1
-
+fun MonthlyTrendChart(data: List<Pair<LocalDate, Float>>, accentColor: Color) {
     Column {
         Row(
             modifier = Modifier
@@ -358,16 +418,13 @@ fun MonthlyBarChart(completionsPerDay: Map<Int, Int>, currentMonth: YearMonth, a
             horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.Bottom
         ) {
-            for (day in 1..daysInMonth) {
-                val count = completionsPerDay[day] ?: 0
-                val progress = count.toFloat() / maxCompletions.coerceAtLeast(1)
-
+            data.forEach { (_, success) ->
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(progress.coerceAtLeast(0.05f))
+                        .fillMaxHeight(success.coerceAtLeast(0.05f))
                         .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp))
-                        .background(if (count > 0) accentColor else Color(0xFFF5F5F5))
+                        .background(if (success > 0) accentColor else Color(0xFFF5F5F5))
                 )
             }
         }
@@ -376,10 +433,8 @@ fun MonthlyBarChart(completionsPerDay: Map<Int, Int>, currentMonth: YearMonth, a
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("1", style = MaterialTheme.typography.bodySmall)
-            Text("${daysInMonth / 3}", style = MaterialTheme.typography.bodySmall)
-            Text("${(daysInMonth * 2) / 3}", style = MaterialTheme.typography.bodySmall)
-            Text("$daysInMonth", style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.monthly_label), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            Text(stringResource(R.string.today), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
         }
     }
 }
