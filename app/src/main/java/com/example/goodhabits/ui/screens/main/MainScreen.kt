@@ -152,7 +152,9 @@ fun MainScreen(
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     var gesturesEnabled by remember { mutableStateOf(false) }
 
-    val pendingSuggestions = timeSuggestions.filter { (id, _) -> !dismissedSuggestions.contains(id) }.values.toList()
+    val pendingSuggestions = remember(timeSuggestions, dismissedSuggestions) {
+        timeSuggestions.filter { (id, _) -> !dismissedSuggestions.contains(id) }.values.toList()
+    }
     var currentSuggestionToShow by remember { mutableStateOf<TimeAdaptationSuggestion?>(null) }
 
     LaunchedEffect(pendingSuggestions) {

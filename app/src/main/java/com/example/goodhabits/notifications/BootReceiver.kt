@@ -23,8 +23,13 @@ class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
             Log.d("BootReceiver", "Device rebooted, rescheduling habit reminders...")
+            val pendingResult = goAsync()
             scope.launch {
-                rescheduleHabitRemindersUseCase()
+                try {
+                    rescheduleHabitRemindersUseCase()
+                } finally {
+                    pendingResult.finish()
+                }
             }
         }
     }

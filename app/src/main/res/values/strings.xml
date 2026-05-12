@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GoodHabits</string>
+    <string name="app_name">Good Habits</string>
     <string name="habits_title">Звички</string>
     <string name="new_habit_title">Нова звичка</string>
     <string name="edit_habit_title">Редагувати звичку</string>
@@ -25,7 +25,9 @@
     <string name="error_general">Помилка: %s</string>
     <string name="notification_channel_name">Нагадування про звички</string>
     <string name="notification_channel_desc">Канал для щоденних нагадувань про звички</string>
-    <string name="notification_content_title">Час для звички! 🔔</string>
+    <string name="notification_content_title">Звичка: \"%s\"</string>
+    <string name="notification_no_motivation">Ви можете вибрати мотивацію для цієї звички</string>
+    <string name="notification_motivation_prefix">Мотивація: \"%s\"</string>
     <string name="notification_default_text">Час виконати звичку!</string>
     <string name="empty_habits_msg">У вас ще немає звичок.</string>
     <string name="create_new_habit_btn">Створити нову звичку</string>

@@ -88,7 +88,7 @@ class AnalyticsViewModel @Inject constructor(
 
         val today = LocalDate.now()
         
-        viewModelScope.launch {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.Default) {
             val currentPeriodStart = today.minusDays(6)
             val currentSuccessRate = calculateSuccessRate(habits, currentPeriodStart, today)
             
