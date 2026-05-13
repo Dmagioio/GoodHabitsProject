@@ -25,9 +25,9 @@
     <string name="error_general">Error: %s</string>
     <string name="notification_channel_name">Habit Reminders</string>
     <string name="notification_channel_desc">Channel for daily habit reminders</string>
-    <string name="notification_content_title">Habit: \"%s\"</string>
+    <string name="notification_content_title">Habit: %s\\</string>
     <string name="notification_no_motivation">You can choose a motivation for this habit</string>
-    <string name="notification_motivation_prefix">Motivation: \"%s\"</string>
+    <string name="notification_motivation_prefix">Motivation: %s</string>
     <string name="notification_default_text">Time to complete your habit!</string>
     <string name="empty_habits_msg">You don\'t have any habits yet.</string>
     <string name="create_new_habit_btn">Create new habit</string>

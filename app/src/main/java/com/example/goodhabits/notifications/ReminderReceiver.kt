@@ -73,7 +73,8 @@ class ReminderReceiver : BroadcastReceiver() {
                 }
 
                 val notification = NotificationCompat.Builder(context, channelId)
-                    .setSmallIcon(R.mipmap.ic_launcher_round)
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setLargeIcon(android.graphics.BitmapFactory.decodeResource(context.resources, R.drawable.app_icon))
                     .setContentTitle(contentTitle)
                     .setContentText(contentText)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
