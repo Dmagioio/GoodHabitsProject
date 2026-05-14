@@ -58,6 +58,7 @@ fun EditHabitScreen(
     viewModel: HabitViewModel
 ) {
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.edit_habit_title)) },
@@ -267,4 +268,3 @@ fun EditHabitContent(
         }
     }
 }
-

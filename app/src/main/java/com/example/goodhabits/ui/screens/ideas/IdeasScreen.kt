@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.*
@@ -46,6 +45,7 @@ fun IdeasScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.ideas), fontWeight = FontWeight.Bold) },
@@ -161,7 +161,22 @@ fun IdeaCategoryDetailScreen(
         viewModel.loadCategories()
     }
 
-    val category = viewModel.getCategoryById(categoryId) ?: return
+    val category = viewModel.getCategoryById(categoryId)
+    if (category == null) {
+        LaunchedEffect(categoryId) {
+            onBack()
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
     Column(
         modifier = Modifier

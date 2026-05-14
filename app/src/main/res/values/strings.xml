@@ -75,7 +75,7 @@
     <string name="streak_days">%d днів</string>
     <string name="streak_label">Ваш поточний стрік</string>
     <string name="streak_label_all">Загальний стрік</string>
-    <string name="streak_start_msg">Почни новий стрік, виконуючи звички</string>
+    <string name="streak_start_msg">Почніть новий стрік, виконуючи звички</string>
     <string name="empty_daily_habits_msg">Натисніть +, щоб додати першу звичку</string>
     <string name="empty_weekly_habits_msg">Ще немає звичок для відстеження за тиждень</string>
     <string name="empty_overall_habits_msg">Додайте звичку, щоб побачити загальну статистику</string>

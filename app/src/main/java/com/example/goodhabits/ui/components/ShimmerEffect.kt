@@ -120,8 +120,3 @@ fun HabitCardSkeleton() {
         }
     }
 }
-
-private fun Modifier.clip(shape: androidx.compose.ui.graphics.Shape) = this.then(
-    Modifier.background(Color.Transparent, shape).clip(shape)
-)
-

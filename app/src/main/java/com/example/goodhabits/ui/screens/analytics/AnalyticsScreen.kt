@@ -48,6 +48,7 @@ fun AnalyticsScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.analytics), fontWeight = FontWeight.Bold) },

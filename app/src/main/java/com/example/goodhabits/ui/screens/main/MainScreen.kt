@@ -42,8 +42,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.goodhabits.R
 import com.example.goodhabits.domain.model.Habit
@@ -57,8 +59,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.goodhabits.domain.analysis.TimeAdaptationSuggestion
@@ -88,7 +89,19 @@ fun StreakCard(streak: Int) {
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-            
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Black.copy(alpha = 0.15f),
+                                Color.Black.copy(alpha = 0.45f)
+                            )
+                        )
+                    )
+            )
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -109,14 +122,23 @@ fun StreakCard(streak: Int) {
                 )
                 
                 Column {
-                    Text(
-                        text = stringResource(R.string.streak_days, streak),
-                        color = Color.White,
-                        style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 36.sp
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = stringResource(R.string.streak_days, streak),
+                            color = Color.White,
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 36.sp
+                            )
                         )
-                    )
+                        if (streak > 0) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "🔥",
+                                fontSize = 32.sp
+                            )
+                        }
+                    }
                     Text(
                         text = stringResource(R.string.streak_label),
                         color = Color.White.copy(alpha = 0.8f),
@@ -138,19 +160,15 @@ fun MainScreen(
     dismissedSuggestions: Set<Int> = emptySet(),
     onDismissSuggestion: (Int) -> Unit = {},
     onApplySuggestion: (TimeAdaptationSuggestion) -> Unit = {},
+    onToggleDrawer: () -> Unit,
+    isDrawerEnabled: Boolean,
     onOpenAddHabit: () -> Unit,
-    onOpenAnalytics: () -> Unit,
-    onOpenSettings: () -> Unit,
     onOpenIdeas: () -> Unit,
     onToggleHabitToday: (Int) -> Unit,
     onToggleHabitForDate: (Int, LocalDate) -> Unit,
     onHabitClick: (Habit) -> Unit
 ) {
-
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    var gesturesEnabled by remember { mutableStateOf(false) }
 
     val pendingSuggestions = remember(timeSuggestions, dismissedSuggestions) {
         timeSuggestions.filter { (id, _) -> !dismissedSuggestions.contains(id) }.values.toList()
@@ -195,134 +213,33 @@ fun MainScreen(
         )
     }
 
-    LaunchedEffect(Unit) {
-        delay(150)
-        gesturesEnabled = true
-    }
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                drawerContainerColor = MaterialTheme.colorScheme.surface
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 40.dp, bottom = 16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.habits_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    StreakCard(streak = currentStreak)
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    NavigationDrawerItem(
-                        label = { Text(stringResource(R.string.ideas)) },
-                        icon = { Icon(imageVector = Icons.Filled.Lightbulb, contentDescription = null) },
-                        selected = false,
-                        onClick = { 
-                            scope.launch { 
-                                drawerState.snapTo(androidx.compose.material3.DrawerValue.Closed)
-                                onOpenIdeas()
-                            } 
-                        },
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            unselectedContainerColor = Color.Transparent,
-                            selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    )
-
-                    NavigationDrawerItem(
-                        label = { Text(stringResource(R.string.analytics)) },
-                        icon = { Icon(imageVector = Icons.Filled.ShowChart, contentDescription = null) },
-                        selected = false,
-                        onClick = { 
-                            scope.launch { 
-                                drawerState.snapTo(androidx.compose.material3.DrawerValue.Closed)
-                                onOpenAnalytics()
-                            } 
-                        },
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            unselectedContainerColor = Color.Transparent,
-                            selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    )
-
-                    NavigationDrawerItem(
-                        label = { Text(stringResource(R.string.settings)) },
-                        icon = { Icon(imageVector = Icons.Filled.Settings, contentDescription = null) },
-                        selected = false,
-                        onClick = { 
-                            scope.launch { 
-                                drawerState.snapTo(androidx.compose.material3.DrawerValue.Closed)
-                                onOpenSettings()
-                            } 
-                        },
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        colors = NavigationDrawerItemDefaults.colors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            unselectedContainerColor = Color.Transparent,
-                            selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    )
-                }
-            }
-        },
-        gesturesEnabled = gesturesEnabled
-    ) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
-                TopAppBar(
-                    title = { Text(stringResource(R.string.habits_title)) },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                if (gesturesEnabled) {
-                                    scope.launch {
-                                        if (drawerState.isClosed) drawerState.open() else drawerState.close()
-                                    }
-                                }
-                            },
-                            enabled = gesturesEnabled
-                        ) {
-                            Icon(Icons.Filled.Menu, contentDescription = "Menu")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = onOpenAddHabit) {
-                            Text(
-                                text = "+",
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontSize = MaterialTheme.typography.titleLarge.fontSize * 1.4f
-                                )
-                            )
-                        }
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.habits_title)) },
+                navigationIcon = {
+                    IconButton(
+                        onClick = onToggleDrawer,
+                        enabled = isDrawerEnabled
+                    ) {
+                        Icon(Icons.Filled.Menu, contentDescription = "Menu")
                     }
-                )
-            }
-        ) { innerPadding ->
+                },
+                actions = {
+                    IconButton(onClick = onOpenAddHabit) {
+                        Text(
+                            text = "+",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize * 1.4f
+                            )
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
@@ -413,6 +330,4 @@ fun MainScreen(
                 }
             }
         }
-    }
 }
-
